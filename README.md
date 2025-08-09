@@ -1,263 +1,411 @@
-# GenAI Chatbot Boilerplate
+# 🤖 GenAI Chatbot Boilerplate
 
-A production-ready, highly configurable GenAI Chatbot with RAG (Retrieval Augmented Generation) capabilities, built with Python/FastAPI backend and React/TypeScript frontend.
+A production-ready, multi-tenant GenAI chatbot platform built with **FastAPI**, **React**, and **PostgreSQL**. Features real-time chat, document processing, RAG capabilities, and comprehensive admin management.
 
-## 🌟 Features
+## ✨ Key Features
 
-### Backend (Python/FastAPI)
-- **Multiple AI Providers**: OpenAI, Anthropic, Google (Gemini), Azure OpenAI, Hugging Face
-- **RAG Implementation**: FAISS vector database for document retrieval
-- **Document Processing**: PDF, DOCX, TXT, MD, XLSX, CSV support
-- **Highly Configurable**: Environment-based configuration with Pydantic Settings
-- **Production Ready**: Logging, monitoring, health checks, caching (Redis)
-- **Database Support**: PostgreSQL with SQLAlchemy and Alembic migrations
-- **Testing**: Comprehensive test suite with pytest
-- **API Documentation**: Auto-generated OpenAPI/Swagger docs
-- **Background Tasks**: Celery for document processing
+### 🎯 **Core Functionality**
+- **Real-time WebSocket Chat** with typing indicators and message broadcasting
+- **Multi-tenant Architecture** with complete tenant isolation
+- **Document Upload & RAG** with automatic text extraction and chunking
+- **AI Model Integration** supporting OpenAI, Anthropic, Google, and custom models
+- **Chat History Persistence** with full message search and session management
 
-### Frontend (React/TypeScript)
-- **Modern UI**: Material-UI components with responsive design
-- **Real-time Chat**: WebSocket support for live conversations
-- **Document Management**: Upload, process, and manage documents
-- **Settings Panel**: Configure AI models, RAG parameters, and preferences
-- **State Management**: React Query for server state management
-- **Routing**: React Router for navigation
-- **Styling**: Tailwind CSS + Material-UI theme integration
+### 🔐 **Authentication & Security**
+- **JWT Authentication** with refresh token rotation
+- **OAuth Support** framework (Google, Microsoft, Apple ready)
+- **Role-Based Access Control** (Super Admin, Tenant Admin, User, Viewer)
+- **Multi-factor Security** with bcrypt password hashing
+- **API Key Management** for tenant-specific AI provider keys
 
-## 🏗 Project Structure
+### 👑 **Admin Center**
+- **Tenant Management** - Create, configure, and monitor tenants
+- **User Management** - Role assignment, activation/deactivation
+- **System Statistics** - Usage metrics and analytics
+- **API Key Configuration** - Secure AI provider key management
+- **Real-time Monitoring** - Connection stats and system health
 
-```
-genai-boilerplate-python/
-├── backend/                 # Python FastAPI backend
-│   ├── src/
-│   │   ├── api/            # API endpoints and routing
-│   │   ├── core/           # Core functionality (database, cache, etc.)
-│   │   ├── models/         # Database models
-│   │   ├── services/       # Business logic services
-│   │   ├── utils/          # Utility functions
-│   │   └── tests/          # Test files
-│   ├── config/             # Configuration files
-│   ├── data/              # Data storage (documents, embeddings)
-│   ├── requirements.txt    # Python dependencies
-│   ├── pyproject.toml     # Python project configuration
-│   └── .env.example       # Environment variables template
-├── frontend/               # React TypeScript frontend
-│   ├── src/
-│   │   ├── components/    # Reusable UI components
-│   │   ├── pages/         # Page components
-│   │   ├── hooks/         # Custom React hooks
-│   │   ├── services/      # API service functions
-│   │   ├── types/         # TypeScript type definitions
-│   │   └── utils/         # Utility functions
-│   ├── public/            # Static files
-│   └── package.json       # Node.js dependencies
-├── scripts/               # Deployment and utility scripts
-├── deployment/            # Docker and Kubernetes configs
-└── docs/                  # Documentation
-```
+### 🏗️ **Technical Excellence**
+- **Async/Await Throughout** - High performance with FastAPI + AsyncIO
+- **Type Safety** - Full Pydantic validation and SQLAlchemy typing
+- **Clean Architecture** - Proper service layer separation
+- **Comprehensive Logging** - Structured logging with Loguru
+- **Health Checks & Metrics** - Kubernetes-ready with Prometheus support
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Python 3.10+
-- Node.js 18+
-- PostgreSQL
-- Redis
+- **Python 3.10+** and **Node.js 18+**
+- **PostgreSQL 13+** and **Redis 6+**
+- **Git** for cloning
 
-### Backend Setup
-
-1. **Navigate to backend directory:**
+### 1. Clone & Setup
 ```bash
-cd backend
+git clone https://github.com/nithinmohantk/genai-boilerplate-python.git
+cd genai-boilerplate-python
 ```
 
-2. **Create and activate virtual environment:**
+### 2. Backend Setup
 ```bash
+# Create virtual environment
+cd backend
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
 
-3. **Install dependencies:**
-```bash
+# Install dependencies
 pip install -r requirements.txt
-```
 
-4. **Configure environment:**
-```bash
+# Setup environment variables
 cp .env.example .env
-# Edit .env with your configuration
+# Edit .env with your database and API keys
 ```
 
-5. **Set up database:**
+### 3. Database Setup
 ```bash
-# Run database migrations (once implemented)
-alembic upgrade head
+# Start PostgreSQL and Redis
+# Then initialize the database with default tenant and admin
+python scripts/init_db.py
 ```
 
-6. **Start the backend server:**
+### 4. Start Backend
 ```bash
 python src/main.py
 ```
+🎉 **Backend running at http://localhost:8000**
 
-The backend API will be available at `http://localhost:8000`
-- API docs: `http://localhost:8000/docs`
-- Health check: `http://localhost:8000/health`
-
-### Frontend Setup
-
-1. **Navigate to frontend directory:**
+### 5. Frontend Setup
 ```bash
+# In a new terminal
 cd frontend
-```
-
-2. **Install dependencies:**
-```bash
 npm install
+npm start
 ```
+🎉 **Frontend running at http://localhost:3000**
 
-3. **Start the development server:**
+### 6. Login & Test
+- **Admin Login**: `admin@example.com` / `admin123!`
+- **API Docs**: http://localhost:8000/docs
+- **WebSocket Test**: Use scripts/test_auth.py
+
+## 📚 API Documentation
+
+### Authentication Endpoints
 ```bash
-npm run dev
+POST /api/v1/auth/login          # User login
+POST /api/v1/auth/register       # User registration  
+POST /api/v1/auth/refresh        # Token refresh
+GET  /api/v1/auth/me             # Current user info
+PUT  /api/v1/auth/me             # Update profile
+POST /api/v1/auth/logout         # User logout
 ```
 
-The frontend will be available at `http://localhost:3000`
+### Chat Endpoints
+```bash
+POST /api/v1/chat/sessions       # Create chat session
+GET  /api/v1/chat/sessions       # List user sessions
+GET  /api/v1/chat/sessions/{id}  # Get session with messages
+POST /api/v1/chat/completions    # Generate AI response
+GET  /api/v1/chat/models         # Available AI models
+GET  /api/v1/chat/search         # Search sessions
+```
+
+### Document Endpoints
+```bash
+POST /api/v1/documents/upload    # Upload document
+GET  /api/v1/documents/          # List documents
+POST /api/v1/documents/{id}/process  # Process for RAG
+GET  /api/v1/documents/{id}/chunks   # View document chunks
+```
+
+### Admin Endpoints
+```bash
+GET  /api/v1/admin/tenants       # Manage tenants (Super Admin)
+GET  /api/v1/admin/users         # Manage users (Tenant Admin)
+GET  /api/v1/admin/api-keys      # Manage API keys
+GET  /api/v1/admin/system/stats  # System statistics
+```
+
+### WebSocket Endpoints
+```bash
+WS   /api/v1/ws/{session_id}     # Real-time chat
+GET  /api/v1/ws/stats            # Connection statistics
+```
+
+## 🏗️ Architecture Overview
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   React SPA     │    │  FastAPI API    │    │  PostgreSQL     │
+│                 │    │                 │    │                 │
+│ • Chat UI       │◄──►│ • REST API      │◄──►│ • Multi-tenant  │
+│ • Admin Panel   │    │ • WebSocket     │    │ • Chat History  │
+│ • Auth Flow     │    │ • Auth & RBAC   │    │ • Documents     │
+└─────────────────┘    │ • Document RAG  │    │ • Users/Tenants │
+                       │ • AI Integration│    └─────────────────┘
+                       └─────────────────┘              │
+                              │                         │
+                    ┌─────────────────┐    ┌─────────────────┐
+                    │      Redis      │    │   AI Providers  │
+                    │                 │    │                 │
+                    │ • Sessions      │    │ • OpenAI        │
+                    │ • Cache         │    │ • Anthropic     │
+                    │ • Task Queue    │    │ • Google        │
+                    └─────────────────┘    │ • Custom APIs   │
+                                          └─────────────────┘
+```
 
 ## 🔧 Configuration
 
 ### Environment Variables
+```bash
+# Database
+DATABASE_URL=postgresql://user:password@localhost:5432/genai_chatbot
+REDIS_URL=redis://localhost:6379/0
 
-The application is highly configurable through environment variables. Copy `.env.example` to `.env` and configure:
+# Security  
+SECRET_KEY=your-super-secret-key-change-in-production
+ACCESS_TOKEN_EXPIRE_MINUTES=30
 
-#### Core Settings
-- `APP_NAME`: Application name
-- `ENVIRONMENT`: Environment (development/production)
-- `SECRET_KEY`: JWT secret key
-- `DATABASE_URL`: PostgreSQL connection URL
-- `REDIS_URL`: Redis connection URL
+# AI Providers (Optional)
+OPENAI_API_KEY=sk-your-openai-key
+ANTHROPIC_API_KEY=claude-your-key
+GOOGLE_API_KEY=your-google-key
 
-#### AI Providers
-Configure your preferred AI provider API keys:
-- `OPENAI_API_KEY`: OpenAI API key
-- `ANTHROPIC_API_KEY`: Anthropic API key
-- `GOOGLE_API_KEY`: Google API key
-- `AZURE_OPENAI_API_KEY`: Azure OpenAI API key
-- `HUGGINGFACE_API_KEY`: Hugging Face API key
+# App Settings
+APP_NAME="GenAI Chatbot"
+ENVIRONMENT=development
+DEBUG=true
+```
 
-#### RAG Configuration
-- `VECTOR_STORE_TYPE`: Vector store type (faiss/chroma/pinecone)
-- `EMBEDDING_MODEL`: Embedding model name
-- `CHUNK_SIZE`: Text chunk size for processing
-- `RAG_K`: Number of documents to retrieve
+### Multi-Model Configuration
+Each tenant can configure their own AI provider keys through the admin panel:
+- **OpenAI**: GPT-4, GPT-3.5 Turbo, GPT-3.5 Turbo 16K
+- **Anthropic**: Claude 3 (Haiku, Sonnet, Opus)  
+- **Google**: Gemini Pro, Gemini Pro Vision
+- **Custom**: Any OpenAI-compatible API
+
+## 🎭 User Roles & Permissions
+
+### Role Hierarchy
+```
+Super Admin    🏆 Full system access, manage all tenants
+    │
+Tenant Admin   👑 Manage tenant users, settings, API keys  
+    │
+Tenant User    👤 Chat, upload documents, personal settings
+    │
+Tenant Viewer  👁️ Read-only access to tenant resources
+```
+
+### Permission Matrix
+| Feature | Super Admin | Tenant Admin | User | Viewer |
+|---------|-------------|--------------|------|--------|
+| Manage Tenants | ✅ | ❌ | ❌ | ❌ |
+| System Stats | ✅ | ❌ | ❌ | ❌ |
+| Manage Users | ✅ | ✅* | ❌ | ❌ |
+| API Keys | ✅ | ✅* | ❌ | ❌ |
+| Chat & AI | ✅ | ✅ | ✅ | ✅ |
+| Upload Docs | ✅ | ✅ | ✅ | ❌ |
+
+*Within their tenant only
+
+## 🔌 WebSocket Integration
+
+### Real-time Features
+- **Live Chat Messages** - Instant message delivery
+- **Typing Indicators** - See when others are typing
+- **Connection Status** - Real-time user presence
+- **Multi-device Sync** - Messages sync across devices
+
+### WebSocket Usage
+```javascript
+// Connect to chat session
+const ws = new WebSocket(`ws://localhost:8000/api/v1/ws/${sessionId}?token=${authToken}`);
+
+// Send message
+ws.send(JSON.stringify({
+  type: 'chat',
+  data: { message: 'Hello AI!' }
+}));
+
+// Receive messages
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+  if (data.type === 'message') {
+    displayMessage(data.data);
+  }
+};
+```
+
+## 📄 Document Processing & RAG
+
+### Supported Formats
+- **Text**: `.txt`, `.md` (Markdown)
+- **PDF**: `.pdf` with text extraction
+- **Word**: `.docx` documents
+- **Spreadsheets**: `.xlsx`, `.csv`
+
+### RAG Pipeline
+1. **Upload** → Document stored securely per tenant
+2. **Process** → Text extraction and intelligent chunking
+3. **Index** → Searchable chunks with metadata
+4. **Query** → Semantic search during chat
+5. **Context** → Relevant chunks added to AI prompts
+
+## 🐳 Docker Deployment
+
+### Quick Docker Setup
+```bash
+# Build and run with docker-compose
+docker-compose up --build
+
+# Or run individual services
+docker build -t genai-backend ./backend
+docker build -t genai-frontend ./frontend
+
+docker run -p 8000:8000 genai-backend
+docker run -p 3000:3000 genai-frontend
+```
+
+### Production Deployment
+```bash
+# Use production docker-compose
+docker-compose -f docker-compose.prod.yml up -d
+
+# Set up reverse proxy (nginx/traefik)
+# Configure SSL certificates
+# Set environment variables for production
+```
 
 ## 🧪 Testing
 
 ### Backend Tests
 ```bash
 cd backend
-pytest
+
+# Run authentication tests
+python scripts/test_auth.py
+
+# Run all tests (when test suite is added)
+pytest tests/
+
+# Check linting
+ruff check src/
+black --check src/
 ```
 
 ### Frontend Tests
 ```bash
 cd frontend
+
+# Run component tests
 npm test
+
+# Run E2E tests
+npm run test:e2e
+
+# Check linting
+npm run lint
 ```
 
-## 📦 Deployment
+## 🔍 Monitoring & Observability
 
-### Docker
+### Health Checks
+- `GET /health` - Application health
+- `GET /api/v1/health/live` - Liveness probe
+- `GET /api/v1/health/ready` - Readiness probe
 
-Build and run with Docker Compose:
+### Metrics
+- `GET /metrics` - Prometheus metrics
+- Connection counts, message rates
+- Database performance, cache hit rates
+- AI API usage and costs
 
-```bash
-docker-compose up -d
-```
+### Logging
+Structured JSON logs with:
+- Request/response tracking
+- Authentication events
+- Chat message audit trail
+- Error tracking with stack traces
 
-### Kubernetes
+## 🚨 Security Features
 
-Deploy to Kubernetes:
+### Authentication Security
+- **JWT with RS256** (configurable algorithm)
+- **Refresh Token Rotation** - Automatic token renewal
+- **Session Management** - Device tracking and revocation
+- **Rate Limiting** - Prevent brute force attacks
 
-```bash
-kubectl apply -f deployment/kubernetes/
-```
+### Data Protection
+- **Tenant Isolation** - Complete data separation
+- **Encrypted Storage** - Passwords with bcrypt
+- **Secure Headers** - CORS, CSP, HSTS configured
+- **Input Validation** - Pydantic schema validation
 
-## 🛠 Development
-
-### Backend Development
-
-The backend uses:
-- **FastAPI**: Modern Python web framework
-- **Pydantic**: Data validation and settings
-- **SQLAlchemy**: Database ORM
-- **LangChain**: AI/ML integrations
-- **FAISS**: Vector similarity search
-- **Redis**: Caching and sessions
-- **Celery**: Background tasks
-- **Loguru**: Structured logging
-
-### Frontend Development
-
-The frontend uses:
-- **React 19**: Modern React with hooks
-- **TypeScript**: Type safety
-- **Material-UI**: Component library
-- **React Query**: Server state management
-- **React Router**: Client-side routing
-- **Tailwind CSS**: Utility-first styling
-
-### Code Quality
-
-Both backend and frontend include:
-- Linting and formatting
-- Pre-commit hooks
-- Type checking
-- Automated testing
-
-## 📚 API Documentation
-
-Once running, visit:
-- **Swagger UI**: `http://localhost:8000/docs`
-- **ReDoc**: `http://localhost:8000/redoc`
-- **OpenAPI JSON**: `http://localhost:8000/openapi.json`
+### API Security
+- **HTTPS Only** in production
+- **API Key Management** - Encrypted storage
+- **Request Logging** - Full audit trail
+- **Permission Checks** - Role-based access control
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests
-5. Run linting and tests
-6. Submit a pull request
+### Development Setup
+```bash
+# Backend development
+cd backend
+pip install -r requirements-dev.txt
+pre-commit install
+
+# Frontend development  
+cd frontend
+npm install
+npm run dev
+```
+
+### Code Standards
+- **Python**: Black formatting, Ruff linting, type hints
+- **JavaScript**: Prettier, ESLint, TypeScript
+- **Commits**: Conventional commits format
+- **Testing**: Unit + integration test coverage
+
+## 📞 Support & Documentation
+
+- **🐛 Issues**: [GitHub Issues](https://github.com/nithinmohantk/genai-boilerplate-python/issues)
+- **💬 Discussions**: [GitHub Discussions](https://github.com/nithinmohantk/genai-boilerplate-python/discussions)  
+- **📖 Wiki**: [Project Wiki](https://github.com/nithinmohantk/genai-boilerplate-python/wiki)
+- **🚀 Releases**: [Release Notes](https://github.com/nithinmohantk/genai-boilerplate-python/releases)
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the **MIT License** - see [LICENSE](LICENSE) file for details.
 
-## 🎯 Roadmap
+---
 
-- [ ] WebSocket support for real-time chat
-- [ ] Authentication and user management
-- [ ] Chat history persistence
-- [ ] Advanced RAG features (re-ranking, hybrid search)
-- [ ] Model fine-tuning support
-- [ ] Multi-language support
-- [ ] Plugin system
-- [ ] Analytics dashboard
+## 🎯 What's Next?
 
-## 🆘 Support
+This boilerplate provides a solid foundation for building production GenAI applications. Here are some potential enhancements:
 
-For questions, issues, or contributions:
-- Create an issue on GitHub
-- Check the documentation in `/docs`
-- Review the configuration options in `.env.example`
+### Immediate Extensions
+- **Vector Database Integration** (Pinecone, Weaviate, Chroma)
+- **Advanced RAG** with semantic chunking and reranking
+- **Streaming Responses** for real-time AI generation
+- **Voice Chat** with speech-to-text integration
 
-## ⚡ Performance Tips
+### Advanced Features
+- **Multi-language Support** with i18n
+- **Custom Model Fine-tuning** workflows
+- **Analytics Dashboard** with usage insights
+- **Workflow Automation** with LangChain agents
 
-- Use Redis for caching frequently accessed data
-- Configure vector store properly for your use case
-- Adjust chunk size based on your document types
-- Monitor API usage and costs
-- Use connection pooling for databases
-- Enable compression for API responses
+### Enterprise Features
+- **SSO Integration** (SAML, LDAP)
+- **Audit Logging** with compliance reports
+- **White-label Branding** per tenant
+- **API Gateway** with rate limiting and quotas
 
-Happy coding! 🚀
+---
+
+**🚀 Ready to build the next generation of AI-powered applications!**
+
+*Built with ❤️ by [Nithin Mohan](https://github.com/nithinmohantk)*
