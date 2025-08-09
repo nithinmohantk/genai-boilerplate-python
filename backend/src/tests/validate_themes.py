@@ -36,7 +36,7 @@ def extract_theme_definitions(filepath: str) -> list[dict[str, Any]]:
             content = f.read()
 
         # Find the start of the theme definitions array
-        start_marker = "def _get_theme_definitions(self) -> List[Dict[str, Any]]:"
+        start_marker = "def _get_theme_definitions(self) -> list[dict[str, Any]]:"
         end_marker = "        ]"  # End of the array
 
         if start_marker not in content:

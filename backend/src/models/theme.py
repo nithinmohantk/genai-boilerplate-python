@@ -7,7 +7,7 @@ from enum import Enum
 from typing import Any
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from sqlalchemy import (
     JSON,
     Boolean,
@@ -288,8 +288,7 @@ class ThemeResponse(ThemeBase):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserSettingsBase(BaseModel):
@@ -365,8 +364,7 @@ class UserSettingsResponse(UserSettingsBase):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ThemePreviewRequest(BaseModel):
