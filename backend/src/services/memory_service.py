@@ -140,7 +140,7 @@ class MemoryService:
         """Search memories using semantic similarity and filters."""
         try:
             # Generate embedding for search query (placeholder)
-            query_embedding = await self._generate_embedding(search_request.query)
+            await self._generate_embedding(search_request.query)
 
             conditions = [
                 UserMemory.user_id == user_id,

@@ -75,7 +75,7 @@ async def upload_document(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to upload document",
-        )
+        ) from e
 
 
 @router.get("/", response_model=list[DocumentResponse])
@@ -107,7 +107,7 @@ async def get_user_documents(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get documents",
-        )
+        ) from e
 
 
 @router.get("/{document_id}", response_model=DocumentResponse)
@@ -138,7 +138,7 @@ async def get_document(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get document",
-        )
+        ) from e
 
 
 @router.post("/{document_id}/process")
@@ -187,7 +187,7 @@ async def process_document(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to process document",
-        )
+        ) from e
 
 
 @router.delete("/{document_id}")
@@ -220,7 +220,7 @@ async def delete_document(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to delete document",
-        )
+        ) from e
 
 
 @router.get("/{document_id}/chunks")
@@ -274,7 +274,7 @@ async def get_document_chunks(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get document chunks",
-        )
+        ) from e
 
 
 @router.get("/{document_id}/download")
@@ -320,4 +320,4 @@ async def download_document(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to download document",
-        )
+        ) from e

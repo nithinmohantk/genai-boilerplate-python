@@ -69,7 +69,7 @@ async def get_all_tenants(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get tenants",
-        )
+        ) from e
 
 
 @router.post("/tenants", response_model=TenantResponse)
@@ -113,7 +113,7 @@ async def create_tenant_admin(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to create tenant",
-        )
+        ) from e
 
 
 @router.put("/tenants/{tenant_id}", response_model=TenantResponse)
@@ -156,7 +156,7 @@ async def update_tenant_admin(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to update tenant",
-        )
+        ) from e
 
 
 @router.get("/tenants/{tenant_id}/stats")
@@ -183,7 +183,7 @@ async def get_tenant_stats(
 
         # Get active user count
         active_user_count_query = select(func.count(User.id)).where(
-            User.tenant_id == tenant_id, User.is_active == True
+            User.tenant_id == tenant_id, User.is_active
         )
         active_user_count_result = await db.execute(active_user_count_query)
         active_user_count = active_user_count_result.scalar() or 0
@@ -206,7 +206,7 @@ async def get_tenant_stats(
 
         # Get API key count
         api_key_count_query = select(func.count(TenantApiKey.id)).where(
-            TenantApiKey.tenant_id == tenant_id, TenantApiKey.is_active == True
+            TenantApiKey.tenant_id == tenant_id, TenantApiKey.is_active
         )
         api_key_count_result = await db.execute(api_key_count_query)
         api_key_count = api_key_count_result.scalar() or 0
@@ -236,7 +236,7 @@ async def get_tenant_stats(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get tenant statistics",
-        )
+        ) from e
 
 
 # User Management
@@ -277,7 +277,7 @@ async def get_tenant_users(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get users",
-        )
+        ) from e
 
 
 @router.post("/users", response_model=UserResponse)
@@ -333,7 +333,7 @@ async def create_user_admin(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to create user",
-        )
+        ) from e
 
 
 @router.put("/users/{user_id}", response_model=UserResponse)
@@ -383,7 +383,7 @@ async def update_user_admin(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to update user",
-        )
+        ) from e
 
 
 @router.post("/users/{user_id}/deactivate")
@@ -437,7 +437,7 @@ async def deactivate_user(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to deactivate user",
-        )
+        ) from e
 
 
 @router.post("/users/{user_id}/activate")
@@ -473,7 +473,7 @@ async def activate_user(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to activate user",
-        )
+        ) from e
 
 
 # API Key Management
@@ -502,7 +502,7 @@ async def get_tenant_api_keys(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get API keys",
-        )
+        ) from e
 
 
 @router.post("/api-keys", response_model=ApiKeyResponse)
@@ -558,7 +558,7 @@ async def create_api_key(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to create API key",
-        )
+        ) from e
 
 
 @router.delete("/api-keys/{key_id}")
@@ -596,7 +596,7 @@ async def delete_api_key(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to delete API key",
-        )
+        ) from e
 
 
 # System Monitoring (Super Admin only)
@@ -631,7 +631,7 @@ async def get_system_stats(
 
         # Get active tokens count
         active_tokens_query = select(func.count(RefreshToken.id)).where(
-            RefreshToken.is_revoked == False
+            not RefreshToken.is_revoked
         )
         active_tokens_result = await db.execute(active_tokens_query)
         active_tokens = active_tokens_result.scalar() or 0
@@ -652,4 +652,4 @@ async def get_system_stats(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get system statistics",
-        )
+        ) from e

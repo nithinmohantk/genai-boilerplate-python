@@ -84,7 +84,7 @@ async def login(
         logger.error(f"Login error: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Login failed"
-        )
+        ) from e
 
 
 @router.post("/register", response_model=UserResponse)
@@ -133,7 +133,7 @@ async def register(user_data: UserCreate, db: AsyncSession = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Registration failed",
-        )
+        ) from e
 
 
 @router.post("/refresh", response_model=TokenResponse)
@@ -172,7 +172,7 @@ async def refresh_token(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Token refresh failed",
-        )
+        ) from e
 
 
 @router.post("/logout")
@@ -231,7 +231,7 @@ async def update_current_user(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Profile update failed",
-        )
+        ) from e
 
 
 @router.post("/change-password")
@@ -281,7 +281,7 @@ async def change_password(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Password change failed",
-        )
+        ) from e
 
 
 @router.post("/revoke-all-tokens")
@@ -303,7 +303,7 @@ async def revoke_all_tokens(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Token revocation failed",
-        )
+        ) from e
 
 
 # Tenant Management (Admin endpoints)
@@ -348,7 +348,7 @@ async def create_tenant(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Tenant creation failed",
-        )
+        ) from e
 
 
 @router.get("/tenants/{tenant_id}", response_model=TenantResponse)
@@ -382,7 +382,7 @@ async def get_tenant(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get tenant",
-        )
+        ) from e
 
 
 @router.put("/tenants/{tenant_id}", response_model=TenantResponse)
@@ -430,7 +430,7 @@ async def update_tenant(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Tenant update failed",
-        )
+        ) from e
 
 
 # OAuth endpoints (placeholder for now)

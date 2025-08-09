@@ -55,7 +55,6 @@ def extract_theme_definitions(filepath: str) -> list[dict[str, Any]]:
 
         # Parse theme definitions
         themes = []
-        current_theme = {}
         theme_lines = []
         in_theme = False
 
@@ -301,7 +300,7 @@ async def check_theme_categories(themes: list[dict[str, Any]]) -> bool:
         logger.info(f"  {category}: {count} themes")
 
     # Check we have at least one theme in each category
-    missing_categories = set(cat.value for cat in ThemeCategory) - set(
+    missing_categories = {cat.value for cat in ThemeCategory} - set(
         category_counts.keys()
     )
     if missing_categories:

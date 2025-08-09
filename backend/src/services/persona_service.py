@@ -71,7 +71,7 @@ class PersonaService:
     ) -> AIPersona | None:
         """Get a specific persona by ID."""
         try:
-            conditions = [AIPersona.id == persona_id, AIPersona.is_active == True]
+            conditions = [AIPersona.id == persona_id, AIPersona.is_active]
 
             # Add access control
             if user_id and tenant_id:
@@ -80,7 +80,7 @@ class PersonaService:
                         AIPersona.user_id == user_id,  # User's own persona
                         AIPersona.persona_type == PersonaType.SYSTEM,  # System persona
                         and_(
-                            AIPersona.is_public == True,
+                            AIPersona.is_public,
                             AIPersona.tenant_id == tenant_id,
                         ),  # Public tenant persona
                     )
@@ -113,7 +113,7 @@ class PersonaService:
     ) -> list[AIPersona]:
         """Get personas available to a user."""
         try:
-            conditions = [AIPersona.is_active == True]
+            conditions = [AIPersona.is_active]
 
             # Access control conditions
             access_conditions = [AIPersona.user_id == user_id]  # User's own personas
@@ -123,7 +123,7 @@ class PersonaService:
 
             if include_public:
                 access_conditions.append(
-                    and_(AIPersona.is_public == True, AIPersona.tenant_id == tenant_id)
+                    and_(AIPersona.is_public, AIPersona.tenant_id == tenant_id)
                 )
 
             conditions.append(or_(*access_conditions))
@@ -313,7 +313,7 @@ class PersonaService:
                 .where(
                     and_(
                         AIPersona.persona_type == PersonaType.SYSTEM,
-                        AIPersona.is_active == True,
+                        AIPersona.is_active,
                         AIPersona.name == "Default Assistant",  # Default system persona
                     )
                 )
@@ -404,7 +404,7 @@ class PersonaService:
     ) -> dict[str, Any]:
         """Get persona usage statistics."""
         try:
-            conditions = [AIPersona.is_active == True]
+            conditions = [AIPersona.is_active]
 
             if user_id:
                 conditions.append(AIPersona.user_id == user_id)

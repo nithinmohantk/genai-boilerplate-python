@@ -121,7 +121,7 @@ class AuthService:
             logger.error(f"Error creating user: {e}")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to create user"
-            )
+            ) from e
 
     async def create_tenant(
         self, name: str, domain: str, created_by: UUID | None = None, **kwargs
@@ -143,7 +143,7 @@ class AuthService:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Failed to create tenant",
-            )
+            ) from e
 
     async def get_user_by_id(self, user_id: UUID) -> User | None:
         """Get user by ID."""
@@ -244,7 +244,7 @@ class AuthService:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to create refresh token",
-            )
+            ) from e
 
     async def verify_access_token(self, token: str) -> dict[str, Any] | None:
         """Verify and decode JWT access token."""
@@ -275,7 +275,7 @@ class AuthService:
                 .options(selectinload(RefreshToken.user).selectinload(User.tenant))
                 .where(
                     RefreshToken.token_hash == token_hash,
-                    RefreshToken.is_revoked == False,
+                    not RefreshToken.is_revoked,
                     RefreshToken.expires_at > datetime.utcnow(),
                 )
             )
@@ -328,7 +328,7 @@ class AuthService:
         """Revoke all refresh tokens for a user."""
         try:
             query = select(RefreshToken).where(
-                RefreshToken.user_id == user_id, RefreshToken.is_revoked == False
+                RefreshToken.user_id == user_id, not RefreshToken.is_revoked
             )
             result = await self.db.execute(query)
             tokens = result.scalars().all()
@@ -390,7 +390,7 @@ class AuthService:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Failed to create OAuth user",
-            )
+            ) from e
 
     async def get_or_create_oauth_user(
         self,
@@ -452,7 +452,7 @@ class AuthService:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="OAuth authentication failed",
-            )
+            ) from e
 
     async def update_user_profile(
         self, user_id: UUID, updates: dict[str, Any]

@@ -72,7 +72,7 @@ class ThemeService:
         """Get a theme by ID."""
         try:
             query = select(Theme).where(
-                and_(Theme.id == theme_id, Theme.is_active == True)
+                and_(Theme.id == theme_id, Theme.is_active)
             )
 
             result = await self.db.execute(query)
@@ -99,7 +99,7 @@ class ThemeService:
             conditions = []
 
             if not include_inactive:
-                conditions.append(Theme.is_active == True)
+                conditions.append(Theme.is_active)
 
             if search_request:
                 if search_request.category:
@@ -563,8 +563,8 @@ class ThemeService:
                 select(Theme)
                 .where(
                     and_(
-                        Theme.is_system == True,
-                        Theme.is_active == True,
+                        Theme.is_system,
+                        Theme.is_active,
                         Theme.name == "corporate_blue",  # Default theme
                     )
                 )
@@ -584,7 +584,7 @@ class ThemeService:
             # Most popular themes
             popular_query = (
                 select(Theme.display_name, Theme.usage_count, Theme.category)
-                .where(Theme.is_active == True)
+                .where(Theme.is_active)
                 .order_by(desc(Theme.usage_count))
                 .limit(10)
             )
@@ -601,14 +601,14 @@ class ThemeService:
             # Themes by category
             category_query = (
                 select(Theme.category, func.count(Theme.id))
-                .where(Theme.is_active == True)
+                .where(Theme.is_active)
                 .group_by(Theme.category)
             )
             category_result = await self.db.execute(category_query)
             themes_by_category = dict(category_result.fetchall())
 
             # Total themes
-            total_query = select(func.count(Theme.id)).where(Theme.is_active == True)
+            total_query = select(func.count(Theme.id)).where(Theme.is_active)
             total_result = await self.db.execute(total_query)
             total_themes = total_result.scalar() or 0
 

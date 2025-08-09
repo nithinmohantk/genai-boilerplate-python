@@ -231,7 +231,7 @@ async def get_websocket_stats():
         logger.error(f"Error getting WebSocket stats: {e}")
         raise HTTPException(
             status_code=500, detail="Failed to get WebSocket statistics"
-        )
+        ) from e
 
 
 @router.get("/ws/sessions/{session_id}/participants")
@@ -265,7 +265,7 @@ async def get_session_participants(session_id: str):
         logger.error(f"Error getting session participants: {e}")
         raise HTTPException(
             status_code=500, detail="Failed to get session participants"
-        )
+        ) from e
 
 
 @router.post("/ws/sessions/{session_id}/broadcast")
@@ -284,7 +284,7 @@ async def broadcast_to_session(session_id: str, message: dict):
 
     except Exception as e:
         logger.error(f"Error broadcasting to session: {e}")
-        raise HTTPException(status_code=500, detail="Failed to broadcast message")
+        raise HTTPException(status_code=500, detail="Failed to broadcast message") from e
 
 
 @router.delete("/ws/connections/{connection_id}")
@@ -303,4 +303,4 @@ async def disconnect_connection(connection_id: str):
 
     except Exception as e:
         logger.error(f"Error disconnecting connection: {e}")
-        raise HTTPException(status_code=500, detail="Failed to disconnect connection")
+        raise HTTPException(status_code=500, detail="Failed to disconnect connection") from e

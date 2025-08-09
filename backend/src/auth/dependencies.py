@@ -131,7 +131,7 @@ async def get_current_user(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Authentication error",
-        )
+        ) from e
 
 
 async def require_tenant_admin(

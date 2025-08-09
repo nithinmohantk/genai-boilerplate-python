@@ -252,7 +252,7 @@ class DocumentService:
                 .where(
                     ChatDocument.user_id == user_id,
                     ChatDocument.tenant_id == tenant_id,
-                    ChatDocument.processed == True,
+                    ChatDocument.processed,
                     DocumentChunk.content.ilike(f"%{query}%"),
                 )
                 .order_by(DocumentChunk.chunk_index)
@@ -289,7 +289,7 @@ class DocumentService:
                 # Try to read as text for unknown types
                 try:
                     return await self._extract_from_txt(file_path)
-                except:
+                except Exception:
                     logger.warning(f"Unsupported file type: {content_type}")
                     return None
 
@@ -406,5 +406,5 @@ class DocumentService:
         try:
             # Simple approximation: ~4 characters per token
             return len(text) // 4
-        except:
+        except Exception:
             return 0

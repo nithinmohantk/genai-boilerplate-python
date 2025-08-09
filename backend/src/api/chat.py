@@ -58,7 +58,7 @@ async def create_chat_session(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to create chat session",
-        )
+        ) from e
 
 
 @router.get("/sessions", response_model=list[ChatSessionResponse])
@@ -88,7 +88,7 @@ async def get_chat_sessions(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get chat sessions",
-        )
+        ) from e
 
 
 @router.get("/sessions/paginated")
@@ -135,7 +135,7 @@ async def get_chat_sessions_paginated(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get paginated chat sessions",
-        )
+        ) from e
 
 
 @router.get("/sessions/{session_id}", response_model=ChatSessionWithMessages)
@@ -181,7 +181,7 @@ async def get_chat_session(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get chat session",
-        )
+        ) from e
 
 
 @router.put("/sessions/{session_id}", response_model=ChatSessionResponse)
@@ -217,7 +217,7 @@ async def update_chat_session(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to update chat session",
-        )
+        ) from e
 
 
 @router.post("/sessions/{session_id}/archive")
@@ -250,7 +250,7 @@ async def archive_chat_session(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to archive chat session",
-        )
+        ) from e
 
 
 @router.delete("/sessions/{session_id}")
@@ -283,7 +283,7 @@ async def delete_chat_session(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to delete chat session",
-        )
+        ) from e
 
 
 @router.get("/sessions/{session_id}/messages", response_model=list[ChatMessageResponse])
@@ -312,7 +312,7 @@ async def get_session_messages(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get session messages",
-        )
+        ) from e
 
 
 @router.post("/completions", response_model=ChatCompletionResponse)
@@ -434,7 +434,7 @@ async def create_chat_completion(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to create chat completion",
-        )
+        ) from e
 
 
 @router.get("/stats")
@@ -457,7 +457,7 @@ async def get_chat_stats(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get chat statistics",
-        )
+        ) from e
 
 
 @router.get("/search")
@@ -494,7 +494,7 @@ async def search_chat_sessions(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to search chat sessions",
-        )
+        ) from e
 
 
 @router.get("/sessions/{session_id}/messages/optimized")
@@ -519,11 +519,11 @@ async def get_session_messages_optimized(
                 cursor_dt = datetime.fromisoformat(
                     cursor_timestamp.replace("Z", "+00:00")
                 )
-            except ValueError:
+            except ValueError as ve:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Invalid cursor timestamp format",
-                )
+                ) from ve
 
         messages, has_more = await chat_service.get_session_messages_optimized(
             session_id=session_id,
@@ -558,7 +558,7 @@ async def get_session_messages_optimized(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get session messages",
-        )
+        ) from e
 
 
 @router.get("/sessions/{session_id}/preview")
@@ -589,7 +589,7 @@ async def get_session_preview(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get session preview",
-        )
+        ) from e
 
 
 @router.post("/sessions/bulk/archive")
@@ -632,7 +632,7 @@ async def bulk_archive_sessions(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to bulk archive sessions",
-        )
+        ) from e
 
 
 @router.post("/cleanup")
@@ -671,7 +671,7 @@ async def cleanup_old_sessions(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to clean up sessions",
-        )
+        ) from e
 
 
 @router.post("/completions/with-files", response_model=ChatCompletionResponse)
@@ -847,7 +847,7 @@ async def create_chat_completion_with_files(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to create chat completion with files",
-        )
+        ) from e
 
 
 @router.get("/sessions/{session_id}/documents")
@@ -909,7 +909,7 @@ async def get_session_documents(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get session documents",
-        )
+        ) from e
 
 
 @router.delete("/sessions/{session_id}/documents/{document_id}")
@@ -959,7 +959,7 @@ async def remove_document_from_session(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to remove document from session",
-        )
+        ) from e
 
 
 @router.get("/models")
@@ -980,4 +980,4 @@ async def get_available_models(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get available models",
-        )
+        ) from e
