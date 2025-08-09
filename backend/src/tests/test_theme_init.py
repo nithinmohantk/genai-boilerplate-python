@@ -7,6 +7,8 @@ import logging
 import os
 import sys
 
+import pytest
+
 # Add the src directory to the path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -50,7 +52,7 @@ class MockThemeService:
         return theme_dict
 
 
-async def test_theme_definitions():
+def test_theme_definitions():
     """Test that all theme definitions are valid."""
     logger.info("Testing theme definitions...")
 
@@ -107,7 +109,7 @@ async def test_theme_definitions():
     logger.info("All theme definitions are valid!")
 
 
-async def test_theme_categories():
+def test_theme_categories():
     """Test that all themes have valid categories."""
     logger.info("Testing theme categories...")
 
@@ -135,7 +137,7 @@ async def test_theme_categories():
     logger.info("All theme categories are valid!")
 
 
-async def test_color_accessibility():
+def test_color_accessibility():
     """Test basic color accessibility checks."""
     logger.info("Testing color accessibility...")
 
@@ -202,6 +204,7 @@ async def test_color_accessibility():
         logger.info("No basic accessibility issues found!")
 
 
+@pytest.mark.asyncio
 async def test_theme_creation():
     """Test theme creation process."""
     logger.info("Testing theme creation process...")
@@ -240,7 +243,10 @@ async def run_tests():
 
     for test in tests:
         try:
-            await test()
+            if asyncio.iscoroutinefunction(test):
+                await test()
+            else:
+                test()
             passed += 1
             logger.info(f"✓ {test.__name__} PASSED")
         except Exception as e:
