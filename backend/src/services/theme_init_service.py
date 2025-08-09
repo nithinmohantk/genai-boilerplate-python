@@ -3,7 +3,7 @@ Theme initialization service for creating default professional themes.
 """
 
 import logging
-from typing import List, Dict, Any
+from typing import Any
 
 from models.theme import Theme, ThemeCategory, ThemeCreate
 from services.theme_service import ThemeService
@@ -17,7 +17,7 @@ class ThemeInitService:
     def __init__(self, theme_service: ThemeService):
         self.theme_service = theme_service
 
-    async def create_default_themes(self) -> List[Theme]:
+    async def create_default_themes(self) -> list[Theme]:
         """Create all default system themes."""
         try:
             themes_data = self._get_theme_definitions()
@@ -33,8 +33,7 @@ class ThemeInitService:
                 if not theme_exists:
                     theme_create = ThemeCreate(**theme_data)
                     theme = await self.theme_service.create_theme(
-                        theme_data=theme_create,
-                        is_system=True
+                        theme_data=theme_create, is_system=True
                     )
                     created_themes.append(theme)
                     logger.info(f"Created system theme: {theme.name}")
@@ -46,7 +45,7 @@ class ThemeInitService:
             logger.error(f"Error creating default themes: {e}")
             return []
 
-    def _get_theme_definitions(self) -> List[Dict[str, Any]]:
+    def _get_theme_definitions(self) -> list[dict[str, Any]]:
         """Get definitions for all default themes."""
         return [
             # 1. Corporate Blue - Professional business environment
@@ -57,51 +56,50 @@ class ThemeInitService:
                 "category": ThemeCategory.PROFESSIONAL,
                 "color_scheme": {
                     "light": {
-                        "primary": "#1e40af",      # Blue-700
-                        "secondary": "#3b82f6",    # Blue-500
-                        "accent": "#60a5fa",       # Blue-400
-                        "background": "#ffffff",    # White
-                        "surface": "#f8fafc",      # Slate-50
-                        "surface_variant": "#e2e8f0", # Slate-200
-                        "text": "#0f172a",        # Slate-900
-                        "text_secondary": "#475569", # Slate-600
-                        "text_muted": "#94a3b8",   # Slate-400
-                        "border": "#e2e8f0",       # Slate-200
-                        "success": "#10b981",      # Emerald-500
-                        "warning": "#f59e0b",      # Amber-500
-                        "error": "#ef4444",        # Red-500
-                        "info": "#3b82f6"          # Blue-500
+                        "primary": "#1e40af",  # Blue-700
+                        "secondary": "#3b82f6",  # Blue-500
+                        "accent": "#60a5fa",  # Blue-400
+                        "background": "#ffffff",  # White
+                        "surface": "#f8fafc",  # Slate-50
+                        "surface_variant": "#e2e8f0",  # Slate-200
+                        "text": "#0f172a",  # Slate-900
+                        "text_secondary": "#475569",  # Slate-600
+                        "text_muted": "#94a3b8",  # Slate-400
+                        "border": "#e2e8f0",  # Slate-200
+                        "success": "#10b981",  # Emerald-500
+                        "warning": "#f59e0b",  # Amber-500
+                        "error": "#ef4444",  # Red-500
+                        "info": "#3b82f6",  # Blue-500
                     },
                     "dark": {
-                        "primary": "#3b82f6",      # Blue-500
-                        "secondary": "#60a5fa",    # Blue-400
-                        "accent": "#93c5fd",       # Blue-300
-                        "background": "#0f172a",   # Slate-900
-                        "surface": "#1e293b",      # Slate-800
-                        "surface_variant": "#334155", # Slate-700
-                        "text": "#f8fafc",        # Slate-50
-                        "text_secondary": "#cbd5e1", # Slate-300
-                        "text_muted": "#64748b",   # Slate-500
-                        "border": "#334155",       # Slate-700
-                        "success": "#10b981",      # Emerald-500
-                        "warning": "#f59e0b",      # Amber-500
-                        "error": "#ef4444",        # Red-500
-                        "info": "#3b82f6"          # Blue-500
-                    }
+                        "primary": "#3b82f6",  # Blue-500
+                        "secondary": "#60a5fa",  # Blue-400
+                        "accent": "#93c5fd",  # Blue-300
+                        "background": "#0f172a",  # Slate-900
+                        "surface": "#1e293b",  # Slate-800
+                        "surface_variant": "#334155",  # Slate-700
+                        "text": "#f8fafc",  # Slate-50
+                        "text_secondary": "#cbd5e1",  # Slate-300
+                        "text_muted": "#64748b",  # Slate-500
+                        "border": "#334155",  # Slate-700
+                        "success": "#10b981",  # Emerald-500
+                        "warning": "#f59e0b",  # Amber-500
+                        "error": "#ef4444",  # Red-500
+                        "info": "#3b82f6",  # Blue-500
+                    },
                 },
                 "supports_dark_mode": True,
                 "accessibility_features": {
                     "high_contrast": True,
                     "focus_indicators": True,
-                    "reduced_motion": True
+                    "reduced_motion": True,
                 },
                 "css_variables": {
                     "border-radius": "6px",
                     "shadow": "0 1px 3px 0 rgb(0 0 0 / 0.1)",
-                    "shadow-lg": "0 10px 15px -3px rgb(0 0 0 / 0.1)"
-                }
+                    "shadow-lg": "0 10px 15px -3px rgb(0 0 0 / 0.1)",
+                },
             },
-
             # 2. Executive Dark - Sophisticated dark theme
             {
                 "name": "executive_dark",
@@ -110,46 +108,45 @@ class ThemeInitService:
                 "category": ThemeCategory.PROFESSIONAL,
                 "color_scheme": {
                     "light": {
-                        "primary": "#111827",      # Gray-900
-                        "secondary": "#374151",    # Gray-700
-                        "accent": "#d97706",       # Amber-600
-                        "background": "#f9fafb",   # Gray-50
-                        "surface": "#ffffff",      # White
-                        "surface_variant": "#f3f4f6", # Gray-100
-                        "text": "#111827",        # Gray-900
-                        "text_secondary": "#4b5563", # Gray-600
-                        "text_muted": "#9ca3af",   # Gray-400
-                        "border": "#e5e7eb",       # Gray-200
-                        "success": "#059669",      # Emerald-600
-                        "warning": "#d97706",      # Amber-600
-                        "error": "#dc2626",        # Red-600
-                        "info": "#2563eb"          # Blue-600
+                        "primary": "#111827",  # Gray-900
+                        "secondary": "#374151",  # Gray-700
+                        "accent": "#d97706",  # Amber-600
+                        "background": "#f9fafb",  # Gray-50
+                        "surface": "#ffffff",  # White
+                        "surface_variant": "#f3f4f6",  # Gray-100
+                        "text": "#111827",  # Gray-900
+                        "text_secondary": "#4b5563",  # Gray-600
+                        "text_muted": "#9ca3af",  # Gray-400
+                        "border": "#e5e7eb",  # Gray-200
+                        "success": "#059669",  # Emerald-600
+                        "warning": "#d97706",  # Amber-600
+                        "error": "#dc2626",  # Red-600
+                        "info": "#2563eb",  # Blue-600
                     },
                     "dark": {
-                        "primary": "#d97706",      # Amber-600
-                        "secondary": "#f59e0b",    # Amber-500
-                        "accent": "#fbbf24",       # Amber-400
-                        "background": "#111827",   # Gray-900
-                        "surface": "#1f2937",      # Gray-800
-                        "surface_variant": "#374151", # Gray-700
-                        "text": "#f9fafb",        # Gray-50
-                        "text_secondary": "#d1d5db", # Gray-300
-                        "text_muted": "#6b7280",   # Gray-500
-                        "border": "#374151",       # Gray-700
-                        "success": "#10b981",      # Emerald-500
-                        "warning": "#f59e0b",      # Amber-500
-                        "error": "#f87171",        # Red-400
-                        "info": "#60a5fa"          # Blue-400
-                    }
+                        "primary": "#d97706",  # Amber-600
+                        "secondary": "#f59e0b",  # Amber-500
+                        "accent": "#fbbf24",  # Amber-400
+                        "background": "#111827",  # Gray-900
+                        "surface": "#1f2937",  # Gray-800
+                        "surface_variant": "#374151",  # Gray-700
+                        "text": "#f9fafb",  # Gray-50
+                        "text_secondary": "#d1d5db",  # Gray-300
+                        "text_muted": "#6b7280",  # Gray-500
+                        "border": "#374151",  # Gray-700
+                        "success": "#10b981",  # Emerald-500
+                        "warning": "#f59e0b",  # Amber-500
+                        "error": "#f87171",  # Red-400
+                        "info": "#60a5fa",  # Blue-400
+                    },
                 },
                 "supports_dark_mode": True,
                 "accessibility_features": {
                     "high_contrast": True,
                     "focus_indicators": True,
-                    "premium_features": True
-                }
+                    "premium_features": True,
+                },
             },
-
             # 3. Minimalist Light - Clean, distraction-free
             {
                 "name": "minimalist_light",
@@ -158,45 +155,44 @@ class ThemeInitService:
                 "category": ThemeCategory.PROFESSIONAL,
                 "color_scheme": {
                     "light": {
-                        "primary": "#000000",      # Black
-                        "secondary": "#525252",    # Gray-500
-                        "accent": "#737373",       # Gray-500
-                        "background": "#ffffff",   # White
-                        "surface": "#fafafa",      # Gray-50
-                        "surface_variant": "#f5f5f5", # Gray-100
-                        "text": "#000000",        # Black
-                        "text_secondary": "#525252", # Gray-500
-                        "text_muted": "#a3a3a3",   # Gray-400
-                        "border": "#e5e5e5",       # Gray-200
-                        "success": "#22c55e",      # Green-500
-                        "warning": "#f97316",      # Orange-500
-                        "error": "#ef4444",        # Red-500
-                        "info": "#6366f1"          # Indigo-500
+                        "primary": "#000000",  # Black
+                        "secondary": "#525252",  # Gray-500
+                        "accent": "#737373",  # Gray-500
+                        "background": "#ffffff",  # White
+                        "surface": "#fafafa",  # Gray-50
+                        "surface_variant": "#f5f5f5",  # Gray-100
+                        "text": "#000000",  # Black
+                        "text_secondary": "#525252",  # Gray-500
+                        "text_muted": "#a3a3a3",  # Gray-400
+                        "border": "#e5e5e5",  # Gray-200
+                        "success": "#22c55e",  # Green-500
+                        "warning": "#f97316",  # Orange-500
+                        "error": "#ef4444",  # Red-500
+                        "info": "#6366f1",  # Indigo-500
                     },
                     "dark": {
-                        "primary": "#ffffff",      # White
-                        "secondary": "#a3a3a3",    # Gray-400
-                        "accent": "#737373",       # Gray-500
-                        "background": "#0a0a0a",   # Near black
-                        "surface": "#171717",      # Gray-900
-                        "surface_variant": "#262626", # Gray-800
-                        "text": "#ffffff",        # White
-                        "text_secondary": "#a3a3a3", # Gray-400
-                        "text_muted": "#525252",   # Gray-600
-                        "border": "#262626",       # Gray-800
-                        "success": "#22c55e",      # Green-500
-                        "warning": "#f97316",      # Orange-500
-                        "error": "#ef4444",        # Red-500
-                        "info": "#6366f1"          # Indigo-500
-                    }
+                        "primary": "#ffffff",  # White
+                        "secondary": "#a3a3a3",  # Gray-400
+                        "accent": "#737373",  # Gray-500
+                        "background": "#0a0a0a",  # Near black
+                        "surface": "#171717",  # Gray-900
+                        "surface_variant": "#262626",  # Gray-800
+                        "text": "#ffffff",  # White
+                        "text_secondary": "#a3a3a3",  # Gray-400
+                        "text_muted": "#525252",  # Gray-600
+                        "border": "#262626",  # Gray-800
+                        "success": "#22c55e",  # Green-500
+                        "warning": "#f97316",  # Orange-500
+                        "error": "#ef4444",  # Red-500
+                        "info": "#6366f1",  # Indigo-500
+                    },
                 },
                 "supports_dark_mode": True,
                 "accessibility_features": {
                     "minimal_distractions": True,
-                    "focus_mode": True
-                }
+                    "focus_mode": True,
+                },
             },
-
             # 4. Focus Mode - High contrast, productivity-focused
             {
                 "name": "focus_mode",
@@ -205,46 +201,45 @@ class ThemeInitService:
                 "category": ThemeCategory.PROFESSIONAL,
                 "color_scheme": {
                     "light": {
-                        "primary": "#7c2d12",      # Orange-800
-                        "secondary": "#ea580c",    # Orange-600
-                        "accent": "#fb923c",       # Orange-400
-                        "background": "#fffbeb",   # Amber-50
-                        "surface": "#ffffff",      # White
-                        "surface_variant": "#fef3c7", # Amber-100
-                        "text": "#7c2d12",        # Orange-800
-                        "text_secondary": "#92400e", # Amber-700
-                        "text_muted": "#d97706",   # Amber-600
-                        "border": "#fbbf24",       # Amber-400
-                        "success": "#166534",      # Green-800
-                        "warning": "#92400e",      # Amber-700
-                        "error": "#991b1b",        # Red-800
-                        "info": "#1e40af"          # Blue-800
+                        "primary": "#7c2d12",  # Orange-800
+                        "secondary": "#ea580c",  # Orange-600
+                        "accent": "#fb923c",  # Orange-400
+                        "background": "#fffbeb",  # Amber-50
+                        "surface": "#ffffff",  # White
+                        "surface_variant": "#fef3c7",  # Amber-100
+                        "text": "#7c2d12",  # Orange-800
+                        "text_secondary": "#92400e",  # Amber-700
+                        "text_muted": "#d97706",  # Amber-600
+                        "border": "#fbbf24",  # Amber-400
+                        "success": "#166534",  # Green-800
+                        "warning": "#92400e",  # Amber-700
+                        "error": "#991b1b",  # Red-800
+                        "info": "#1e40af",  # Blue-800
                     },
                     "dark": {
-                        "primary": "#fb923c",      # Orange-400
-                        "secondary": "#f97316",    # Orange-500
-                        "accent": "#fdba74",       # Orange-300
-                        "background": "#0c0a09",   # Stone-950
-                        "surface": "#1c1917",      # Stone-900
-                        "surface_variant": "#292524", # Stone-800
-                        "text": "#fbbf24",        # Amber-400
-                        "text_secondary": "#fcd34d", # Amber-300
-                        "text_muted": "#a16207",   # Amber-700
-                        "border": "#451a03",       # Amber-900
-                        "success": "#22c55e",      # Green-500
-                        "warning": "#f59e0b",      # Amber-500
-                        "error": "#f87171",        # Red-400
-                        "info": "#60a5fa"          # Blue-400
-                    }
+                        "primary": "#fb923c",  # Orange-400
+                        "secondary": "#f97316",  # Orange-500
+                        "accent": "#fdba74",  # Orange-300
+                        "background": "#0c0a09",  # Stone-950
+                        "surface": "#1c1917",  # Stone-900
+                        "surface_variant": "#292524",  # Stone-800
+                        "text": "#fbbf24",  # Amber-400
+                        "text_secondary": "#fcd34d",  # Amber-300
+                        "text_muted": "#a16207",  # Amber-700
+                        "border": "#451a03",  # Amber-900
+                        "success": "#22c55e",  # Green-500
+                        "warning": "#f59e0b",  # Amber-500
+                        "error": "#f87171",  # Red-400
+                        "info": "#60a5fa",  # Blue-400
+                    },
                 },
                 "supports_dark_mode": True,
                 "accessibility_features": {
                     "ultra_high_contrast": True,
                     "focus_indicators": True,
-                    "reduced_motion": True
-                }
+                    "reduced_motion": True,
+                },
             },
-
             # 5. Tech Console - Developer-friendly
             {
                 "name": "tech_console",
@@ -253,50 +248,49 @@ class ThemeInitService:
                 "category": ThemeCategory.INDUSTRY,
                 "color_scheme": {
                     "light": {
-                        "primary": "#059669",      # Emerald-600
-                        "secondary": "#10b981",    # Emerald-500
-                        "accent": "#34d399",       # Emerald-400
-                        "background": "#f0fdf4",   # Green-50
-                        "surface": "#ffffff",      # White
-                        "surface_variant": "#dcfce7", # Green-100
-                        "text": "#064e3b",        # Emerald-900
-                        "text_secondary": "#047857", # Emerald-700
-                        "text_muted": "#059669",   # Emerald-600
-                        "border": "#bbf7d0",       # Green-200
-                        "success": "#059669",      # Emerald-600
-                        "warning": "#d97706",      # Amber-600
-                        "error": "#dc2626",        # Red-600
-                        "info": "#2563eb",         # Blue-600
-                        "code_bg": "#f8fafc",      # Slate-50
-                        "code_border": "#e2e8f0"   # Slate-200
+                        "primary": "#059669",  # Emerald-600
+                        "secondary": "#10b981",  # Emerald-500
+                        "accent": "#34d399",  # Emerald-400
+                        "background": "#f0fdf4",  # Green-50
+                        "surface": "#ffffff",  # White
+                        "surface_variant": "#dcfce7",  # Green-100
+                        "text": "#064e3b",  # Emerald-900
+                        "text_secondary": "#047857",  # Emerald-700
+                        "text_muted": "#059669",  # Emerald-600
+                        "border": "#bbf7d0",  # Green-200
+                        "success": "#059669",  # Emerald-600
+                        "warning": "#d97706",  # Amber-600
+                        "error": "#dc2626",  # Red-600
+                        "info": "#2563eb",  # Blue-600
+                        "code_bg": "#f8fafc",  # Slate-50
+                        "code_border": "#e2e8f0",  # Slate-200
                     },
                     "dark": {
-                        "primary": "#10b981",      # Emerald-500
-                        "secondary": "#34d399",    # Emerald-400
-                        "accent": "#6ee7b7",       # Emerald-300
-                        "background": "#0f1419",   # Custom dark
-                        "surface": "#1a1f2e",      # Custom surface
-                        "surface_variant": "#2d3748", # Custom variant
-                        "text": "#a7f3d0",        # Emerald-200
-                        "text_secondary": "#6ee7b7", # Emerald-300
-                        "text_muted": "#10b981",   # Emerald-500
-                        "border": "#064e3b",       # Emerald-900
-                        "success": "#10b981",      # Emerald-500
-                        "warning": "#f59e0b",      # Amber-500
-                        "error": "#f87171",        # Red-400
-                        "info": "#60a5fa",         # Blue-400
-                        "code_bg": "#1e293b",      # Slate-800
-                        "code_border": "#334155"   # Slate-700
-                    }
+                        "primary": "#10b981",  # Emerald-500
+                        "secondary": "#34d399",  # Emerald-400
+                        "accent": "#6ee7b7",  # Emerald-300
+                        "background": "#0f1419",  # Custom dark
+                        "surface": "#1a1f2e",  # Custom surface
+                        "surface_variant": "#2d3748",  # Custom variant
+                        "text": "#a7f3d0",  # Emerald-200
+                        "text_secondary": "#6ee7b7",  # Emerald-300
+                        "text_muted": "#10b981",  # Emerald-500
+                        "border": "#064e3b",  # Emerald-900
+                        "success": "#10b981",  # Emerald-500
+                        "warning": "#f59e0b",  # Amber-500
+                        "error": "#f87171",  # Red-400
+                        "info": "#60a5fa",  # Blue-400
+                        "code_bg": "#1e293b",  # Slate-800
+                        "code_border": "#334155",  # Slate-700
+                    },
                 },
                 "supports_dark_mode": True,
                 "accessibility_features": {
                     "syntax_highlighting": True,
                     "code_focused": True,
-                    "monospace_optimization": True
-                }
+                    "monospace_optimization": True,
+                },
             },
-
             # 6. Medical Professional - Healthcare optimized
             {
                 "name": "medical_professional",
@@ -305,50 +299,49 @@ class ThemeInitService:
                 "category": ThemeCategory.INDUSTRY,
                 "color_scheme": {
                     "light": {
-                        "primary": "#0369a1",      # Sky-700
-                        "secondary": "#0ea5e9",    # Sky-500
-                        "accent": "#38bdf8",       # Sky-400
-                        "background": "#f0f9ff",   # Sky-50
-                        "surface": "#ffffff",      # White
-                        "surface_variant": "#e0f2fe", # Sky-100
-                        "text": "#0c4a6e",        # Sky-900
-                        "text_secondary": "#0369a1", # Sky-700
-                        "text_muted": "#0284c7",   # Sky-600
-                        "border": "#bae6fd",       # Sky-200
-                        "success": "#059669",      # Emerald-600
-                        "warning": "#d97706",      # Amber-600
-                        "error": "#dc2626",        # Red-600
-                        "info": "#0369a1",         # Sky-700
-                        "medical_urgent": "#dc2626", # Red-600
-                        "medical_normal": "#059669"  # Emerald-600
+                        "primary": "#0369a1",  # Sky-700
+                        "secondary": "#0ea5e9",  # Sky-500
+                        "accent": "#38bdf8",  # Sky-400
+                        "background": "#f0f9ff",  # Sky-50
+                        "surface": "#ffffff",  # White
+                        "surface_variant": "#e0f2fe",  # Sky-100
+                        "text": "#0c4a6e",  # Sky-900
+                        "text_secondary": "#0369a1",  # Sky-700
+                        "text_muted": "#0284c7",  # Sky-600
+                        "border": "#bae6fd",  # Sky-200
+                        "success": "#059669",  # Emerald-600
+                        "warning": "#d97706",  # Amber-600
+                        "error": "#dc2626",  # Red-600
+                        "info": "#0369a1",  # Sky-700
+                        "medical_urgent": "#dc2626",  # Red-600
+                        "medical_normal": "#059669",  # Emerald-600
                     },
                     "dark": {
-                        "primary": "#0ea5e9",      # Sky-500
-                        "secondary": "#38bdf8",    # Sky-400
-                        "accent": "#7dd3fc",       # Sky-300
-                        "background": "#0c1821",   # Custom medical dark
-                        "surface": "#1e3a5f",      # Custom surface
-                        "surface_variant": "#2c5282", # Custom variant
-                        "text": "#e0f2fe",        # Sky-100
-                        "text_secondary": "#bae6fd", # Sky-200
-                        "text_muted": "#0ea5e9",   # Sky-500
-                        "border": "#0c4a6e",       # Sky-900
-                        "success": "#10b981",      # Emerald-500
-                        "warning": "#f59e0b",      # Amber-500
-                        "error": "#f87171",        # Red-400
-                        "info": "#38bdf8",         # Sky-400
-                        "medical_urgent": "#f87171", # Red-400
-                        "medical_normal": "#10b981"  # Emerald-500
-                    }
+                        "primary": "#0ea5e9",  # Sky-500
+                        "secondary": "#38bdf8",  # Sky-400
+                        "accent": "#7dd3fc",  # Sky-300
+                        "background": "#0c1821",  # Custom medical dark
+                        "surface": "#1e3a5f",  # Custom surface
+                        "surface_variant": "#2c5282",  # Custom variant
+                        "text": "#e0f2fe",  # Sky-100
+                        "text_secondary": "#bae6fd",  # Sky-200
+                        "text_muted": "#0ea5e9",  # Sky-500
+                        "border": "#0c4a6e",  # Sky-900
+                        "success": "#10b981",  # Emerald-500
+                        "warning": "#f59e0b",  # Amber-500
+                        "error": "#f87171",  # Red-400
+                        "info": "#38bdf8",  # Sky-400
+                        "medical_urgent": "#f87171",  # Red-400
+                        "medical_normal": "#10b981",  # Emerald-500
+                    },
                 },
                 "supports_dark_mode": True,
                 "accessibility_features": {
                     "medical_compliance": True,
                     "calming_colors": True,
-                    "high_readability": True
-                }
+                    "high_readability": True,
+                },
             },
-
             # 7. Creative Studio - Design and creative work
             {
                 "name": "creative_studio",
@@ -357,50 +350,49 @@ class ThemeInitService:
                 "category": ThemeCategory.CREATIVE,
                 "color_scheme": {
                     "light": {
-                        "primary": "#7c3aed",      # Violet-600
-                        "secondary": "#8b5cf6",    # Violet-500
-                        "accent": "#a78bfa",       # Violet-400
-                        "background": "#faf5ff",   # Violet-50
-                        "surface": "#ffffff",      # White
-                        "surface_variant": "#f3e8ff", # Violet-100
-                        "text": "#581c87",        # Violet-900
-                        "text_secondary": "#7c3aed", # Violet-600
-                        "text_muted": "#8b5cf6",   # Violet-500
-                        "border": "#c4b5fd",       # Violet-300
-                        "success": "#059669",      # Emerald-600
-                        "warning": "#d97706",      # Amber-600
-                        "error": "#dc2626",        # Red-600
-                        "info": "#7c3aed",         # Violet-600
-                        "creative_accent_1": "#ec4899", # Pink-500
-                        "creative_accent_2": "#06b6d4"  # Cyan-500
+                        "primary": "#7c3aed",  # Violet-600
+                        "secondary": "#8b5cf6",  # Violet-500
+                        "accent": "#a78bfa",  # Violet-400
+                        "background": "#faf5ff",  # Violet-50
+                        "surface": "#ffffff",  # White
+                        "surface_variant": "#f3e8ff",  # Violet-100
+                        "text": "#581c87",  # Violet-900
+                        "text_secondary": "#7c3aed",  # Violet-600
+                        "text_muted": "#8b5cf6",  # Violet-500
+                        "border": "#c4b5fd",  # Violet-300
+                        "success": "#059669",  # Emerald-600
+                        "warning": "#d97706",  # Amber-600
+                        "error": "#dc2626",  # Red-600
+                        "info": "#7c3aed",  # Violet-600
+                        "creative_accent_1": "#ec4899",  # Pink-500
+                        "creative_accent_2": "#06b6d4",  # Cyan-500
                     },
                     "dark": {
-                        "primary": "#8b5cf6",      # Violet-500
-                        "secondary": "#a78bfa",    # Violet-400
-                        "accent": "#c4b5fd",       # Violet-300
-                        "background": "#1a0b2e",   # Custom creative dark
-                        "surface": "#2d1b4e",      # Custom surface
-                        "surface_variant": "#4c1d95", # Violet-800
-                        "text": "#f3e8ff",        # Violet-100
-                        "text_secondary": "#c4b5fd", # Violet-300
-                        "text_muted": "#8b5cf6",   # Violet-500
-                        "border": "#581c87",       # Violet-900
-                        "success": "#10b981",      # Emerald-500
-                        "warning": "#f59e0b",      # Amber-500
-                        "error": "#f87171",        # Red-400
-                        "info": "#a78bfa",         # Violet-400
-                        "creative_accent_1": "#f472b6", # Pink-400
-                        "creative_accent_2": "#22d3ee"  # Cyan-400
-                    }
+                        "primary": "#8b5cf6",  # Violet-500
+                        "secondary": "#a78bfa",  # Violet-400
+                        "accent": "#c4b5fd",  # Violet-300
+                        "background": "#1a0b2e",  # Custom creative dark
+                        "surface": "#2d1b4e",  # Custom surface
+                        "surface_variant": "#4c1d95",  # Violet-800
+                        "text": "#f3e8ff",  # Violet-100
+                        "text_secondary": "#c4b5fd",  # Violet-300
+                        "text_muted": "#8b5cf6",  # Violet-500
+                        "border": "#581c87",  # Violet-900
+                        "success": "#10b981",  # Emerald-500
+                        "warning": "#f59e0b",  # Amber-500
+                        "error": "#f87171",  # Red-400
+                        "info": "#a78bfa",  # Violet-400
+                        "creative_accent_1": "#f472b6",  # Pink-400
+                        "creative_accent_2": "#22d3ee",  # Cyan-400
+                    },
                 },
                 "supports_dark_mode": True,
                 "accessibility_features": {
                     "creative_inspiration": True,
                     "color_harmony": True,
-                    "design_focused": True
-                }
+                    "design_focused": True,
+                },
             },
-
             # 8. Financial Dashboard - Finance industry
             {
                 "name": "financial_dashboard",
@@ -409,52 +401,51 @@ class ThemeInitService:
                 "category": ThemeCategory.INDUSTRY,
                 "color_scheme": {
                     "light": {
-                        "primary": "#065f46",      # Emerald-800
-                        "secondary": "#059669",    # Emerald-600
-                        "accent": "#10b981",       # Emerald-500
-                        "background": "#f0fdf4",   # Green-50
-                        "surface": "#ffffff",      # White
-                        "surface_variant": "#dcfce7", # Green-100
-                        "text": "#064e3b",        # Emerald-900
-                        "text_secondary": "#065f46", # Emerald-800
-                        "text_muted": "#047857",   # Emerald-700
-                        "border": "#bbf7d0",       # Green-200
-                        "success": "#059669",      # Emerald-600
-                        "warning": "#d97706",      # Amber-600
-                        "error": "#dc2626",        # Red-600
-                        "info": "#0369a1",         # Sky-700
-                        "profit": "#059669",       # Emerald-600
-                        "loss": "#dc2626",         # Red-600
-                        "neutral": "#6b7280"       # Gray-500
+                        "primary": "#065f46",  # Emerald-800
+                        "secondary": "#059669",  # Emerald-600
+                        "accent": "#10b981",  # Emerald-500
+                        "background": "#f0fdf4",  # Green-50
+                        "surface": "#ffffff",  # White
+                        "surface_variant": "#dcfce7",  # Green-100
+                        "text": "#064e3b",  # Emerald-900
+                        "text_secondary": "#065f46",  # Emerald-800
+                        "text_muted": "#047857",  # Emerald-700
+                        "border": "#bbf7d0",  # Green-200
+                        "success": "#059669",  # Emerald-600
+                        "warning": "#d97706",  # Amber-600
+                        "error": "#dc2626",  # Red-600
+                        "info": "#0369a1",  # Sky-700
+                        "profit": "#059669",  # Emerald-600
+                        "loss": "#dc2626",  # Red-600
+                        "neutral": "#6b7280",  # Gray-500
                     },
                     "dark": {
-                        "primary": "#10b981",      # Emerald-500
-                        "secondary": "#34d399",    # Emerald-400
-                        "accent": "#6ee7b7",       # Emerald-300
-                        "background": "#0f1b0f",   # Custom financial dark
-                        "surface": "#1a2e1a",      # Custom surface
-                        "surface_variant": "#065f46", # Emerald-800
-                        "text": "#dcfce7",        # Green-100
-                        "text_secondary": "#bbf7d0", # Green-200
-                        "text_muted": "#34d399",   # Emerald-400
-                        "border": "#064e3b",       # Emerald-900
-                        "success": "#10b981",      # Emerald-500
-                        "warning": "#f59e0b",      # Amber-500
-                        "error": "#f87171",        # Red-400
-                        "info": "#38bdf8",         # Sky-400
-                        "profit": "#34d399",       # Emerald-400
-                        "loss": "#f87171",         # Red-400
-                        "neutral": "#9ca3af"       # Gray-400
-                    }
+                        "primary": "#10b981",  # Emerald-500
+                        "secondary": "#34d399",  # Emerald-400
+                        "accent": "#6ee7b7",  # Emerald-300
+                        "background": "#0f1b0f",  # Custom financial dark
+                        "surface": "#1a2e1a",  # Custom surface
+                        "surface_variant": "#065f46",  # Emerald-800
+                        "text": "#dcfce7",  # Green-100
+                        "text_secondary": "#bbf7d0",  # Green-200
+                        "text_muted": "#34d399",  # Emerald-400
+                        "border": "#064e3b",  # Emerald-900
+                        "success": "#10b981",  # Emerald-500
+                        "warning": "#f59e0b",  # Amber-500
+                        "error": "#f87171",  # Red-400
+                        "info": "#38bdf8",  # Sky-400
+                        "profit": "#34d399",  # Emerald-400
+                        "loss": "#f87171",  # Red-400
+                        "neutral": "#9ca3af",  # Gray-400
+                    },
                 },
                 "supports_dark_mode": True,
                 "accessibility_features": {
                     "data_visualization": True,
                     "financial_indicators": True,
-                    "professional_grade": True
-                }
+                    "professional_grade": True,
+                },
             },
-
             # 9. High Contrast - WCAG AAA accessibility
             {
                 "name": "high_contrast",
@@ -463,47 +454,46 @@ class ThemeInitService:
                 "category": ThemeCategory.ACCESSIBILITY,
                 "color_scheme": {
                     "light": {
-                        "primary": "#000000",      # Black
-                        "secondary": "#000000",    # Black
-                        "accent": "#0000ff",       # Blue
-                        "background": "#ffffff",   # White
-                        "surface": "#ffffff",      # White
-                        "surface_variant": "#f0f0f0", # Light gray
-                        "text": "#000000",        # Black
-                        "text_secondary": "#000000", # Black
-                        "text_muted": "#333333",   # Dark gray
-                        "border": "#000000",       # Black
-                        "success": "#008000",      # Green
-                        "warning": "#ff8c00",      # Orange
-                        "error": "#ff0000",        # Red
-                        "info": "#0000ff"          # Blue
+                        "primary": "#000000",  # Black
+                        "secondary": "#000000",  # Black
+                        "accent": "#0000ff",  # Blue
+                        "background": "#ffffff",  # White
+                        "surface": "#ffffff",  # White
+                        "surface_variant": "#f0f0f0",  # Light gray
+                        "text": "#000000",  # Black
+                        "text_secondary": "#000000",  # Black
+                        "text_muted": "#333333",  # Dark gray
+                        "border": "#000000",  # Black
+                        "success": "#008000",  # Green
+                        "warning": "#ff8c00",  # Orange
+                        "error": "#ff0000",  # Red
+                        "info": "#0000ff",  # Blue
                     },
                     "dark": {
-                        "primary": "#ffffff",      # White
-                        "secondary": "#ffffff",    # White
-                        "accent": "#00ffff",       # Cyan
-                        "background": "#000000",   # Black
-                        "surface": "#000000",      # Black
-                        "surface_variant": "#333333", # Dark gray
-                        "text": "#ffffff",        # White
-                        "text_secondary": "#ffffff", # White
-                        "text_muted": "#cccccc",   # Light gray
-                        "border": "#ffffff",       # White
-                        "success": "#00ff00",      # Lime
-                        "warning": "#ffff00",      # Yellow
-                        "error": "#ff0000",        # Red
-                        "info": "#00ffff"          # Cyan
-                    }
+                        "primary": "#ffffff",  # White
+                        "secondary": "#ffffff",  # White
+                        "accent": "#00ffff",  # Cyan
+                        "background": "#000000",  # Black
+                        "surface": "#000000",  # Black
+                        "surface_variant": "#333333",  # Dark gray
+                        "text": "#ffffff",  # White
+                        "text_secondary": "#ffffff",  # White
+                        "text_muted": "#cccccc",  # Light gray
+                        "border": "#ffffff",  # White
+                        "success": "#00ff00",  # Lime
+                        "warning": "#ffff00",  # Yellow
+                        "error": "#ff0000",  # Red
+                        "info": "#00ffff",  # Cyan
+                    },
                 },
                 "supports_dark_mode": True,
                 "accessibility_features": {
                     "wcag_aaa_compliant": True,
                     "screen_reader_optimized": True,
                     "keyboard_navigation": True,
-                    "ultra_high_contrast": True
-                }
+                    "ultra_high_contrast": True,
+                },
             },
-
             # 10. Night Shift - Blue light reduced
             {
                 "name": "night_shift",
@@ -512,46 +502,45 @@ class ThemeInitService:
                 "category": ThemeCategory.ACCESSIBILITY,
                 "color_scheme": {
                     "light": {
-                        "primary": "#a16207",      # Amber-700
-                        "secondary": "#d97706",    # Amber-600
-                        "accent": "#f59e0b",       # Amber-500
-                        "background": "#fffbeb",   # Amber-50
-                        "surface": "#fefce8",      # Yellow-50
-                        "surface_variant": "#fef3c7", # Amber-100
-                        "text": "#78350f",        # Amber-900
-                        "text_secondary": "#92400e", # Amber-700
-                        "text_muted": "#a16207",   # Amber-700
-                        "border": "#fed7aa",       # Orange-200
-                        "success": "#166534",      # Green-800
-                        "warning": "#92400e",      # Amber-700
-                        "error": "#991b1b",        # Red-800
-                        "info": "#a16207"          # Amber-700
+                        "primary": "#a16207",  # Amber-700
+                        "secondary": "#d97706",  # Amber-600
+                        "accent": "#f59e0b",  # Amber-500
+                        "background": "#fffbeb",  # Amber-50
+                        "surface": "#fefce8",  # Yellow-50
+                        "surface_variant": "#fef3c7",  # Amber-100
+                        "text": "#78350f",  # Amber-900
+                        "text_secondary": "#92400e",  # Amber-700
+                        "text_muted": "#a16207",  # Amber-700
+                        "border": "#fed7aa",  # Orange-200
+                        "success": "#166534",  # Green-800
+                        "warning": "#92400e",  # Amber-700
+                        "error": "#991b1b",  # Red-800
+                        "info": "#a16207",  # Amber-700
                     },
                     "dark": {
-                        "primary": "#fbbf24",      # Amber-400
-                        "secondary": "#f59e0b",    # Amber-500
-                        "accent": "#fdba74",       # Orange-300
-                        "background": "#1c1410",   # Custom warm dark
-                        "surface": "#2c2112",      # Custom warm surface
-                        "surface_variant": "#451a03", # Amber-900
-                        "text": "#fef3c7",        # Amber-100
-                        "text_secondary": "#fed7aa", # Orange-200
-                        "text_muted": "#f59e0b",   # Amber-500
-                        "border": "#78350f",       # Amber-900
-                        "success": "#22c55e",      # Green-500
-                        "warning": "#f59e0b",      # Amber-500
-                        "error": "#f87171",        # Red-400
-                        "info": "#fbbf24"          # Amber-400
-                    }
+                        "primary": "#fbbf24",  # Amber-400
+                        "secondary": "#f59e0b",  # Amber-500
+                        "accent": "#fdba74",  # Orange-300
+                        "background": "#1c1410",  # Custom warm dark
+                        "surface": "#2c2112",  # Custom warm surface
+                        "surface_variant": "#451a03",  # Amber-900
+                        "text": "#fef3c7",  # Amber-100
+                        "text_secondary": "#fed7aa",  # Orange-200
+                        "text_muted": "#f59e0b",  # Amber-500
+                        "border": "#78350f",  # Amber-900
+                        "success": "#22c55e",  # Green-500
+                        "warning": "#f59e0b",  # Amber-500
+                        "error": "#f87171",  # Red-400
+                        "info": "#fbbf24",  # Amber-400
+                    },
                 },
                 "supports_dark_mode": True,
                 "accessibility_features": {
                     "blue_light_filter": True,
                     "eye_strain_reduction": True,
-                    "evening_optimized": True
-                }
+                    "evening_optimized": True,
+                },
             },
-
             # 11. Accessibility Plus - Enhanced readability
             {
                 "name": "accessibility_plus",
@@ -560,37 +549,37 @@ class ThemeInitService:
                 "category": ThemeCategory.ACCESSIBILITY,
                 "color_scheme": {
                     "light": {
-                        "primary": "#1f2937",      # Gray-800
-                        "secondary": "#374151",    # Gray-700
-                        "accent": "#4b5563",       # Gray-600
-                        "background": "#ffffff",   # White
-                        "surface": "#f9fafb",      # Gray-50
-                        "surface_variant": "#f3f4f6", # Gray-100
-                        "text": "#111827",        # Gray-900
-                        "text_secondary": "#374151", # Gray-700
-                        "text_muted": "#6b7280",   # Gray-500
-                        "border": "#d1d5db",       # Gray-300
-                        "success": "#047857",      # Emerald-700
-                        "warning": "#b45309",      # Amber-700
-                        "error": "#b91c1c",        # Red-700
-                        "info": "#1d4ed8"          # Blue-700
+                        "primary": "#1f2937",  # Gray-800
+                        "secondary": "#374151",  # Gray-700
+                        "accent": "#4b5563",  # Gray-600
+                        "background": "#ffffff",  # White
+                        "surface": "#f9fafb",  # Gray-50
+                        "surface_variant": "#f3f4f6",  # Gray-100
+                        "text": "#111827",  # Gray-900
+                        "text_secondary": "#374151",  # Gray-700
+                        "text_muted": "#6b7280",  # Gray-500
+                        "border": "#d1d5db",  # Gray-300
+                        "success": "#047857",  # Emerald-700
+                        "warning": "#b45309",  # Amber-700
+                        "error": "#b91c1c",  # Red-700
+                        "info": "#1d4ed8",  # Blue-700
                     },
                     "dark": {
-                        "primary": "#e5e7eb",      # Gray-200
-                        "secondary": "#d1d5db",    # Gray-300
-                        "accent": "#9ca3af",       # Gray-400
-                        "background": "#1f2937",   # Gray-800
-                        "surface": "#374151",      # Gray-700
-                        "surface_variant": "#4b5563", # Gray-600
-                        "text": "#f3f4f6",        # Gray-100
-                        "text_secondary": "#e5e7eb", # Gray-200
-                        "text_muted": "#9ca3af",   # Gray-400
-                        "border": "#6b7280",       # Gray-500
-                        "success": "#10b981",      # Emerald-500
-                        "warning": "#f59e0b",      # Amber-500
-                        "error": "#ef4444",        # Red-500
-                        "info": "#3b82f6"          # Blue-500
-                    }
+                        "primary": "#e5e7eb",  # Gray-200
+                        "secondary": "#d1d5db",  # Gray-300
+                        "accent": "#9ca3af",  # Gray-400
+                        "background": "#1f2937",  # Gray-800
+                        "surface": "#374151",  # Gray-700
+                        "surface_variant": "#4b5563",  # Gray-600
+                        "text": "#f3f4f6",  # Gray-100
+                        "text_secondary": "#e5e7eb",  # Gray-200
+                        "text_muted": "#9ca3af",  # Gray-400
+                        "border": "#6b7280",  # Gray-500
+                        "success": "#10b981",  # Emerald-500
+                        "warning": "#f59e0b",  # Amber-500
+                        "error": "#ef4444",  # Red-500
+                        "info": "#3b82f6",  # Blue-500
+                    },
                 },
                 "supports_dark_mode": True,
                 "accessibility_features": {
@@ -598,10 +587,9 @@ class ThemeInitService:
                     "focus_indicators": True,
                     "large_touch_targets": True,
                     "clear_navigation": True,
-                    "wcag_aa_compliant": True
-                }
+                    "wcag_aa_compliant": True,
+                },
             },
-
             # 12. Warm Reading - Comfortable for long conversations
             {
                 "name": "warm_reading",
@@ -610,44 +598,44 @@ class ThemeInitService:
                 "category": ThemeCategory.ACCESSIBILITY,
                 "color_scheme": {
                     "light": {
-                        "primary": "#9a3412",      # Orange-800
-                        "secondary": "#c2410c",    # Orange-700
-                        "accent": "#ea580c",       # Orange-600
-                        "background": "#fefce8",   # Yellow-50
-                        "surface": "#fffbeb",      # Amber-50
-                        "surface_variant": "#fef3c7", # Amber-100
-                        "text": "#78350f",        # Amber-900
-                        "text_secondary": "#92400e", # Amber-700
-                        "text_muted": "#a16207",   # Amber-700
-                        "border": "#fed7aa",       # Orange-200
-                        "success": "#15803d",      # Green-700
-                        "warning": "#a16207",      # Amber-700
-                        "error": "#c2410c",        # Orange-700
-                        "info": "#1d4ed8"          # Blue-700
+                        "primary": "#9a3412",  # Orange-800
+                        "secondary": "#c2410c",  # Orange-700
+                        "accent": "#ea580c",  # Orange-600
+                        "background": "#fefce8",  # Yellow-50
+                        "surface": "#fffbeb",  # Amber-50
+                        "surface_variant": "#fef3c7",  # Amber-100
+                        "text": "#78350f",  # Amber-900
+                        "text_secondary": "#92400e",  # Amber-700
+                        "text_muted": "#a16207",  # Amber-700
+                        "border": "#fed7aa",  # Orange-200
+                        "success": "#15803d",  # Green-700
+                        "warning": "#a16207",  # Amber-700
+                        "error": "#c2410c",  # Orange-700
+                        "info": "#1d4ed8",  # Blue-700
                     },
                     "dark": {
-                        "primary": "#fb923c",      # Orange-400
-                        "secondary": "#f97316",    # Orange-500
-                        "accent": "#fdba74",       # Orange-300
-                        "background": "#1c1814",   # Custom warm dark
-                        "surface": "#2c2416",      # Custom warm surface
-                        "surface_variant": "#451a03", # Amber-900
-                        "text": "#fef3c7",        # Amber-100
-                        "text_secondary": "#fed7aa", # Orange-200
-                        "text_muted": "#f59e0b",   # Amber-500
-                        "border": "#78350f",       # Amber-900
-                        "success": "#22c55e",      # Green-500
-                        "warning": "#f59e0b",      # Amber-500
-                        "error": "#f97316",        # Orange-500
-                        "info": "#60a5fa"          # Blue-400
-                    }
+                        "primary": "#fb923c",  # Orange-400
+                        "secondary": "#f97316",  # Orange-500
+                        "accent": "#fdba74",  # Orange-300
+                        "background": "#1c1814",  # Custom warm dark
+                        "surface": "#2c2416",  # Custom warm surface
+                        "surface_variant": "#451a03",  # Amber-900
+                        "text": "#fef3c7",  # Amber-100
+                        "text_secondary": "#fed7aa",  # Orange-200
+                        "text_muted": "#f59e0b",  # Amber-500
+                        "border": "#78350f",  # Amber-900
+                        "success": "#22c55e",  # Green-500
+                        "warning": "#f59e0b",  # Amber-500
+                        "error": "#f97316",  # Orange-500
+                        "info": "#60a5fa",  # Blue-400
+                    },
                 },
                 "supports_dark_mode": True,
                 "accessibility_features": {
                     "reading_optimized": True,
                     "warm_color_temperature": True,
                     "reduced_eye_strain": True,
-                    "comfortable_contrast": True
-                }
-            }
+                    "comfortable_contrast": True,
+                },
+            },
         ]

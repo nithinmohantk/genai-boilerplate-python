@@ -4,11 +4,12 @@ Main API router that includes all sub-routers for version 1 of the API.
 
 from fastapi import APIRouter
 
+from api.admin import router as admin_router
+
 # Import routers
 from api.auth import router as auth_router
 from api.chat import router as chat_router
 from api.documents import router as documents_router
-from api.admin import router as admin_router
 
 # Create main API router
 api_router = APIRouter()
