@@ -4,7 +4,8 @@ Main API router that includes all sub-routers for version 1 of the API.
 
 from fastapi import APIRouter
 
-# Import routers (we'll create these next)
+# Import routers
+from api.auth import router as auth_router
 # from api.v1.endpoints import chat, documents, health, admin
 
 # Create main API router
@@ -42,6 +43,9 @@ async def status():
         "status": "operational",
     }
 
+
+# Include routers
+api_router.include_router(auth_router, prefix="/auth", tags=["Authentication"])
 
 # TODO: Include other routers when created
 # api_router.include_router(chat.router, prefix="/chat", tags=["chat"])

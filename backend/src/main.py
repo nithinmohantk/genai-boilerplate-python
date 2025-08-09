@@ -21,6 +21,7 @@ from loguru import logger
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 
 from api.v1.router import api_router
+from api.websocket import router as websocket_router
 from config.settings import settings
 from core.cache import close_cache, init_cache
 from core.database import close_db, init_db
@@ -92,6 +93,7 @@ def create_app() -> FastAPI:
 
     # Include routers
     app.include_router(api_router, prefix=settings.api_v1_prefix)
+    app.include_router(websocket_router, prefix="/api/v1", tags=["WebSocket"])
 
     # Health check endpoint
     @app.get("/health")
