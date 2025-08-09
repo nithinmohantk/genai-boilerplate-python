@@ -11,10 +11,16 @@ from pytest_bdd import given, when, then, parsers
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
-from backend.src.models.auth import User, Tenant, UserRole
-from backend.src.services.auth_service import AuthService
-from backend.src.core.database import get_db
-from backend.src.main import app
+import sys
+import os
+
+# Add src to the path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../../src"))
+
+from models.auth import User, Tenant, UserRole
+from services.auth_service import AuthService
+from core.database import get_db
+from main import app
 
 
 class AuthenticationStepContext:

@@ -9,9 +9,15 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from backend.src.core.database import Base, get_db
-from backend.src.main import app
-from backend.src.models import auth, chat, theme  # Import all models
+import sys
+import os
+
+# Add src to the path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../src"))
+
+from core.database import Base, get_db
+from main import app
+from models import theme  # Import theme models
 
 
 @pytest.fixture(scope="session")
