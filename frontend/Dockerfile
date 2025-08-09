@@ -18,18 +18,13 @@ RUN apk add --no-cache \
 # Create app directory
 WORKDIR /app
 
-# Copy package files first for better caching
+# Copy package files and source code
 COPY package*.json ./
-
-# Install all dependencies including dev dependencies for build
-RUN npm ci --include=dev --no-optional
-
-# Copy source code
 COPY . .
 
-# Fix Rollup platform dependency issue and build
-RUN rm -rf node_modules/.cache package-lock.json && \
-    npm install && \
+# Install dependencies with explicit platform binaries
+RUN npm install && \
+    npm install --save-optional @rollup/rollup-linux-x64-musl && \
     npm run build
 
 # Production stage
