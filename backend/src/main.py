@@ -3,28 +3,29 @@ Main FastAPI application entry point.
 Configures the app with middleware, routers, and startup/shutdown events.
 """
 
-import os
 import sys
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-# Add the backend src directory to Python path
-backend_dir = Path(__file__).parent.parent
-sys.path.insert(0, str(backend_dir))
+# Add the backend directories to Python path
+backend_root = Path(__file__).parent.parent  # backend/
+src_dir = Path(__file__).parent  # backend/src/
+sys.path.insert(0, str(backend_root))  # For config module
+sys.path.insert(0, str(src_dir))  # For src modules
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
 from loguru import logger
-from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 
-from config.settings import settings
-from core.database import init_db, close_db
-from core.cache import init_cache, close_cache
-from core.logging import setup_logging
-from core.exceptions import setup_exception_handlers
 from api.v1.router import api_router
+from config.settings import settings
+from core.cache import close_cache, init_cache
+from core.database import close_db, init_db
+from core.exceptions import setup_exception_handlers
+from core.logging import setup_logging
 from services.health import health_service
 
 
@@ -33,36 +34,36 @@ async def lifespan(app: FastAPI):
     """Application lifespan context manager."""
     # Startup
     logger.info("Starting GenAI Chatbot Backend...")
-    
+
     # Setup logging
     setup_logging()
-    
+
     # Initialize database
     await init_db()
-    
+
     # Initialize cache
     await init_cache()
-    
+
     # Initialize health service
     await health_service.initialize()
-    
+
     logger.info("Application startup complete")
-    
+
     yield
-    
+
     # Shutdown
     logger.info("Shutting down GenAI Chatbot Backend...")
-    
+
     # Close connections
     await close_cache()
     await close_db()
-    
+
     logger.info("Application shutdown complete")
 
 
 def create_app() -> FastAPI:
     """Create and configure FastAPI application."""
-    
+
     app = FastAPI(
         title=settings.app_name,
         version=settings.app_version,
@@ -72,34 +73,35 @@ def create_app() -> FastAPI:
         openapi_url=settings.openapi_url if settings.is_development else None,
         lifespan=lifespan,
     )
-    
+
     # Add CORS middleware
     app.add_middleware(
         CORSMiddleware,
         **settings.cors_config,
     )
-    
+
     # Add trusted host middleware for production
     if settings.is_production:
         app.add_middleware(
             TrustedHostMiddleware,
             allowed_hosts=["*"],  # Configure as needed
         )
-    
+
     # Setup exception handlers
     setup_exception_handlers(app)
-    
+
     # Include routers
     app.include_router(api_router, prefix=settings.api_v1_prefix)
-    
+
     # Health check endpoint
     @app.get("/health")
     async def health_check():
         """Health check endpoint."""
         return await health_service.check_health()
-    
+
     # Metrics endpoint
     if settings.enable_metrics:
+
         @app.get("/metrics")
         async def metrics():
             """Prometheus metrics endpoint."""
@@ -107,7 +109,7 @@ def create_app() -> FastAPI:
                 content=generate_latest(),
                 media_type=CONTENT_TYPE_LATEST,
             )
-    
+
     # Root endpoint
     @app.get("/")
     async def root():
@@ -117,7 +119,7 @@ def create_app() -> FastAPI:
             "version": settings.app_version,
             "docs_url": f"{settings.docs_url}" if settings.is_development else None,
         }
-    
+
     return app
 
 
@@ -126,7 +128,7 @@ app = create_app()
 
 if __name__ == "__main__":
     import uvicorn
-    
+
     uvicorn.run(
         "main:app",
         host=settings.host,
