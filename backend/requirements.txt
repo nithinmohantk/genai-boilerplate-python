@@ -47,3 +47,9 @@ passlib[bcrypt]>=1.7.4
 # Monitoring and logging
 loguru>=0.7.2
 prometheus-client>=0.19.0
+
+# BDD Testing
+pytest-bdd>=7.0.1
+pytest-asyncio>=0.23.2
+pytest-cov>=4.0.0
+factory-boy>=3.3.0

@@ -141,37 +141,155 @@ jobs:
       with:
         sarif_file: 'trivy-results.sarif'
 
-  docker-build:
+  # Container Vulnerability Scanning
+  container-security:
     runs-on: ubuntu-latest
     needs: [test-backend, test-frontend]
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
     
     steps:
     - uses: actions/checkout@v4
     
+    - name: Build backend image for scanning
+      run: |
+        docker build -t local/genai-backend:scan ./backend
+    
+    - name: Run Trivy vulnerability scanner on backend
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'local/genai-backend:scan'
+        format: 'sarif'
+        output: 'backend-trivy-results.sarif'
+    
+    - name: Build frontend image for scanning
+      run: |
+        docker build -t local/genai-frontend:scan ./frontend
+    
+    - name: Run Trivy vulnerability scanner on frontend
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'local/genai-frontend:scan'
+        format: 'sarif'
+        output: 'frontend-trivy-results.sarif'
+    
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
+        sarif_file: '*.sarif'
+
+  # Docker Build and Push
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend, container-security]
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Needed for semantic versioning
+    
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
+      with:
+        platforms: linux/amd64,linux/arm64
     
     - name: Login to Docker Hub
       uses: docker/login-action@v3
       with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        username: thingxcloud
+        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+    
+    - name: Generate semantic version
+      id: semver
+      run: |
+        # Get the latest tag
+        LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+        echo "Latest tag: $LATEST_TAG"
+        
+        # Remove 'v' prefix and increment patch version
+        VERSION=$(echo $LATEST_TAG | sed 's/^v//')
+        MAJOR=$(echo $VERSION | cut -d. -f1)
+        MINOR=$(echo $VERSION | cut -d. -f2)
+        PATCH=$(echo $VERSION | cut -d. -f3)
+        
+        # Increment patch version
+        NEW_PATCH=$((PATCH + 1))
+        NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
+        
+        echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+        echo "tag=v$NEW_VERSION" >> $GITHUB_OUTPUT
+        echo "short_sha=${GITHUB_SHA::8}" >> $GITHUB_OUTPUT
     
     - name: Build and push backend image
       uses: docker/build-push-action@v5
       with:
         context: ./backend
+        platforms: linux/amd64,linux/arm64
         push: true
         tags: |
-          ${{ secrets.DOCKER_USERNAME }}/genai-chatbot-backend:latest
-          ${{ secrets.DOCKER_USERNAME }}/genai-chatbot-backend:${{ github.sha }}
+          thingxcloud/genai-chatbot-backend:latest
+          thingxcloud/genai-chatbot-backend:${{ steps.semver.outputs.version }}
+          thingxcloud/genai-chatbot-backend:${{ steps.semver.outputs.short_sha }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        labels: |
+          org.opencontainers.image.title=GenAI Chatbot Backend
+          org.opencontainers.image.description=FastAPI backend for GenAI Chatbot
+          org.opencontainers.image.version=${{ steps.semver.outputs.version }}
+          org.opencontainers.image.revision=${{ github.sha }}
+          org.opencontainers.image.created=${{ github.event.head_commit.timestamp }}
+          org.opencontainers.image.source=${{ github.repositoryUrl }}
     
     - name: Build and push frontend image
       uses: docker/build-push-action@v5
       with:
         context: ./frontend
+        platforms: linux/amd64,linux/arm64
         push: true
         tags: |
-          ${{ secrets.DOCKER_USERNAME }}/genai-chatbot-frontend:latest
-          ${{ secrets.DOCKER_USERNAME }}/genai-chatbot-frontend:${{ github.sha }}
+          thingxcloud/genai-chatbot-frontend:latest
+          thingxcloud/genai-chatbot-frontend:${{ steps.semver.outputs.version }}
+          thingxcloud/genai-chatbot-frontend:${{ steps.semver.outputs.short_sha }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        labels: |
+          org.opencontainers.image.title=GenAI Chatbot Frontend
+          org.opencontainers.image.description=React frontend for GenAI Chatbot
+          org.opencontainers.image.version=${{ steps.semver.outputs.version }}
+          org.opencontainers.image.revision=${{ github.sha }}
+          org.opencontainers.image.created=${{ github.event.head_commit.timestamp }}
+          org.opencontainers.image.source=${{ github.repositoryUrl }}
+    
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.semver.outputs.tag }}
+        release_name: Release ${{ steps.semver.outputs.tag }}
+        body: |
+          ## What's Changed
+          
+          ### Docker Images
+          - Backend: `thingxcloud/genai-chatbot-backend:${{ steps.semver.outputs.version }}`
+          - Frontend: `thingxcloud/genai-chatbot-frontend:${{ steps.semver.outputs.version }}`
+          
+          ### Deployment
+          ```bash
+          # Update your deployment with new version
+          export IMAGE_TAG=${{ steps.semver.outputs.version }}
+          docker-compose -f docker-compose.prod.yml up -d
+          
+          # Or for Kubernetes
+          kubectl set image deployment/backend backend=thingxcloud/genai-chatbot-backend:${{ steps.semver.outputs.version }} -n genai-chatbot
+          kubectl set image deployment/frontend frontend=thingxcloud/genai-chatbot-frontend:${{ steps.semver.outputs.version }} -n genai-chatbot
+          ```
+          
+          **Full Changelog**: https://github.com/${{ github.repository }}/compare/${{ github.event.before }}...${{ github.sha }}
+        draft: false
+        prerelease: false
+    
+    outputs:
+      version: ${{ steps.semver.outputs.version }}
+      tag: ${{ steps.semver.outputs.tag }}

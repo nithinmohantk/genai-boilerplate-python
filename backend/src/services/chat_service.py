@@ -4,13 +4,14 @@ Chat service for managing chat sessions, messages, and AI interactions.
 
 import logging
 import time
-from datetime import datetime
-from typing import Optional, List, Dict, Any
+from datetime import datetime, timedelta
+from typing import Optional, List, Dict, Any, Tuple
 from uuid import UUID
 
-from sqlalchemy import select, func, desc
+from sqlalchemy import select, func, desc, and_, or_, text
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import selectinload, joinedload
+from sqlalchemy.dialects.postgresql import insert
 
 from models.chat import (
     ChatSession, ChatMessage, ChatDocument, DocumentChunk,
@@ -487,3 +488,259 @@ class ChatService:
         except Exception as e:
             logger.error(f"Error searching sessions: {e}")
             return []
+
+    async def get_user_sessions_paginated(
+        self,
+        user_id: UUID,
+        tenant_id: UUID,
+        page: int = 1,
+        page_size: int = 20,
+        status: Optional[SessionStatus] = None,
+        include_message_count: bool = True
+    ) -> Tuple[List[Dict[str, Any]], int]:
+        """Get user's chat sessions with optimized pagination and metadata."""
+        try:
+            offset = (page - 1) * page_size
+            
+            # Build base query
+            base_conditions = [
+                ChatSession.user_id == user_id,
+                ChatSession.tenant_id == tenant_id
+            ]
+            
+            if status:
+                base_conditions.append(ChatSession.status == status)
+            else:
+                base_conditions.append(ChatSession.status != SessionStatus.DELETED)
+            
+            # Query for sessions with message counts
+            if include_message_count:
+                query = (
+                    select(
+                        ChatSession,
+                        func.count(ChatMessage.id).label('message_count'),
+                        func.max(ChatMessage.timestamp).label('last_message_at')
+                    )
+                    .outerjoin(ChatMessage, ChatSession.id == ChatMessage.session_id)
+                    .where(and_(*base_conditions))
+                    .group_by(ChatSession.id)
+                    .order_by(desc(func.coalesce(func.max(ChatMessage.timestamp), ChatSession.updated_at)))
+                    .limit(page_size)
+                    .offset(offset)
+                )
+            else:
+                query = (
+                    select(ChatSession)
+                    .where(and_(*base_conditions))
+                    .order_by(desc(ChatSession.updated_at))
+                    .limit(page_size)
+                    .offset(offset)
+                )
+            
+            # Execute query
+            result = await self.db.execute(query)
+            
+            if include_message_count:
+                rows = result.all()
+                sessions = []
+                for row in rows:
+                    session_dict = {
+                        'id': str(row.ChatSession.id),
+                        'tenant_id': str(row.ChatSession.tenant_id),
+                        'user_id': str(row.ChatSession.user_id),
+                        'title': row.ChatSession.title,
+                        'status': row.ChatSession.status,
+                        'created_at': row.ChatSession.created_at.isoformat(),
+                        'updated_at': row.ChatSession.updated_at.isoformat(),
+                        'message_count': row.message_count,
+                        'last_message_at': row.last_message_at.isoformat() if row.last_message_at else None
+                    }
+                    sessions.append(session_dict)
+            else:
+                sessions = result.scalars().all()
+            
+            # Get total count for pagination
+            count_query = (
+                select(func.count(ChatSession.id))
+                .where(and_(*base_conditions))
+            )
+            count_result = await self.db.execute(count_query)
+            total_count = count_result.scalar() or 0
+            
+            return sessions, total_count
+            
+        except Exception as e:
+            logger.error(f"Error getting paginated sessions: {e}")
+            return [], 0
+
+    async def get_session_messages_optimized(
+        self,
+        session_id: UUID,
+        user_id: UUID,
+        page: int = 1,
+        page_size: int = 50,
+        cursor_timestamp: Optional[datetime] = None
+    ) -> Tuple[List[ChatMessage], bool]:
+        """Get session messages with cursor-based pagination for better performance."""
+        try:
+            # Verify user has access to session
+            session = await self.get_session(session_id, user_id)
+            if not session:
+                return [], False
+            
+            # Build query with cursor-based pagination
+            query = (
+                select(ChatMessage)
+                .where(ChatMessage.session_id == session_id)
+                .order_by(desc(ChatMessage.timestamp))
+                .limit(page_size + 1)  # Get one extra to check if there are more
+            )
+            
+            if cursor_timestamp:
+                query = query.where(ChatMessage.timestamp < cursor_timestamp)
+            
+            result = await self.db.execute(query)
+            messages = result.scalars().all()
+            
+            # Check if there are more messages
+            has_more = len(messages) > page_size
+            if has_more:
+                messages = messages[:-1]  # Remove the extra message
+            
+            # Return in chronological order
+            return list(reversed(messages)), has_more
+            
+        except Exception as e:
+            logger.error(f"Error getting optimized session messages: {e}")
+            return [], False
+
+    async def bulk_archive_sessions(
+        self,
+        session_ids: List[UUID],
+        user_id: UUID
+    ) -> int:
+        """Bulk archive multiple sessions for better performance."""
+        try:
+            if not session_ids:
+                return 0
+            
+            # Update sessions in bulk
+            update_query = (
+                ChatSession.__table__.update()
+                .where(
+                    and_(
+                        ChatSession.id.in_(session_ids),
+                        ChatSession.user_id == user_id,
+                        ChatSession.status != SessionStatus.DELETED
+                    )
+                )
+                .values(
+                    status=SessionStatus.ARCHIVED,
+                    archived_at=datetime.now(),
+                    updated_at=datetime.now()
+                )
+                .returning(ChatSession.id)
+            )
+            
+            result = await self.db.execute(update_query)
+            updated_count = len(result.fetchall())
+            await self.db.commit()
+            
+            logger.info(f"Bulk archived {updated_count} sessions for user {user_id}")
+            return updated_count
+            
+        except Exception as e:
+            await self.db.rollback()
+            logger.error(f"Error bulk archiving sessions: {e}")
+            return 0
+
+    async def cleanup_old_sessions(
+        self,
+        user_id: UUID,
+        tenant_id: UUID,
+        days_old: int = 90,
+        max_sessions: int = 1000
+    ) -> int:
+        """Clean up old sessions to maintain performance with large session counts."""
+        try:
+            cutoff_date = datetime.now() - timedelta(days=days_old)
+            
+            # Find old sessions to archive/delete
+            cleanup_query = (
+                select(ChatSession.id)
+                .where(
+                    and_(
+                        ChatSession.user_id == user_id,
+                        ChatSession.tenant_id == tenant_id,
+                        ChatSession.status == SessionStatus.ACTIVE,
+                        ChatSession.updated_at < cutoff_date
+                    )
+                )
+                .order_by(ChatSession.updated_at)
+                .limit(max_sessions)
+            )
+            
+            result = await self.db.execute(cleanup_query)
+            session_ids = [row.id for row in result.fetchall()]
+            
+            if not session_ids:
+                return 0
+            
+            # Archive old sessions
+            archived_count = await self.bulk_archive_sessions(session_ids, user_id)
+            
+            logger.info(f"Cleaned up {archived_count} old sessions for user {user_id}")
+            return archived_count
+            
+        except Exception as e:
+            logger.error(f"Error cleaning up old sessions: {e}")
+            return 0
+
+    async def get_session_preview(
+        self,
+        session_id: UUID,
+        user_id: UUID
+    ) -> Optional[Dict[str, Any]]:
+        """Get a lightweight session preview with last message."""
+        try:
+            # Get session with last message in one query
+            query = (
+                select(
+                    ChatSession,
+                    ChatMessage.message.label('last_message'),
+                    ChatMessage.timestamp.label('last_message_at'),
+                    func.count(ChatMessage.id).label('message_count')
+                )
+                .outerjoin(ChatMessage, ChatSession.id == ChatMessage.session_id)
+                .where(
+                    and_(
+                        ChatSession.id == session_id,
+                        ChatSession.user_id == user_id,
+                        ChatSession.status != SessionStatus.DELETED
+                    )
+                )
+                .group_by(ChatSession.id, ChatMessage.message, ChatMessage.timestamp)
+                .order_by(desc(ChatMessage.timestamp))
+                .limit(1)
+            )
+            
+            result = await self.db.execute(query)
+            row = result.first()
+            
+            if not row:
+                return None
+            
+            return {
+                'id': str(row.ChatSession.id),
+                'title': row.ChatSession.title,
+                'status': row.ChatSession.status,
+                'created_at': row.ChatSession.created_at.isoformat(),
+                'updated_at': row.ChatSession.updated_at.isoformat(),
+                'last_message': row.last_message,
+                'last_message_at': row.last_message_at.isoformat() if row.last_message_at else None,
+                'message_count': row.message_count
+            }
+            
+        except Exception as e:
+            logger.error(f"Error getting session preview: {e}")
+            return None

@@ -6,7 +6,7 @@ import logging
 from typing import List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from auth.dependencies import get_current_user, CurrentUser
@@ -81,6 +81,53 @@ async def get_chat_sessions(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get chat sessions"
+        )
+
+
+@router.get("/sessions/paginated")
+async def get_chat_sessions_paginated(
+    current_user: CurrentUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+    status_filter: Optional[SessionStatus] = Query(None, alias="status"),
+    include_message_count: bool = Query(True)
+):
+    """Get user's chat sessions with optimized pagination for large datasets."""
+    try:
+        chat_service = ChatService(db)
+        
+        sessions, total_count = await chat_service.get_user_sessions_paginated(
+            user_id=current_user.user_id,
+            tenant_id=current_user.tenant_id,
+            page=page,
+            page_size=page_size,
+            status=status_filter,
+            include_message_count=include_message_count
+        )
+        
+        total_pages = (total_count + page_size - 1) // page_size
+        
+        return {
+            "status": "success",
+            "data": {
+                "sessions": sessions,
+                "pagination": {
+                    "current_page": page,
+                    "page_size": page_size,
+                    "total_pages": total_pages,
+                    "total_count": total_count,
+                    "has_next": page < total_pages,
+                    "has_prev": page > 1
+                }
+            }
+        }
+    
+    except Exception as e:
+        logger.error(f"Error getting paginated chat sessions: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to get paginated chat sessions"
         )
 
 
@@ -441,6 +488,464 @@ async def search_chat_sessions(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to search chat sessions"
+        )
+
+
+@router.get("/sessions/{session_id}/messages/optimized")
+async def get_session_messages_optimized(
+    session_id: UUID,
+    current_user: CurrentUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(50, ge=1, le=200),
+    cursor_timestamp: Optional[str] = Query(None)
+):
+    """Get session messages with optimized cursor-based pagination."""
+    try:
+        from datetime import datetime
+        
+        chat_service = ChatService(db)
+        
+        # Parse cursor timestamp if provided
+        cursor_dt = None
+        if cursor_timestamp:
+            try:
+                cursor_dt = datetime.fromisoformat(cursor_timestamp.replace('Z', '+00:00'))
+            except ValueError:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Invalid cursor timestamp format"
+                )
+        
+        messages, has_more = await chat_service.get_session_messages_optimized(
+            session_id=session_id,
+            user_id=current_user.user_id,
+            page=page,
+            page_size=page_size,
+            cursor_timestamp=cursor_dt
+        )
+        
+        # Prepare next cursor
+        next_cursor = None
+        if has_more and messages:
+            next_cursor = messages[-1].timestamp.isoformat()
+        
+        return {
+            "status": "success",
+            "data": {
+                "messages": [ChatMessageResponse.from_orm(msg) for msg in messages],
+                "pagination": {
+                    "page": page,
+                    "page_size": page_size,
+                    "has_more": has_more,
+                    "next_cursor": next_cursor
+                }
+            }
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting optimized session messages: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to get session messages"
+        )
+
+
+@router.get("/sessions/{session_id}/preview")
+async def get_session_preview(
+    session_id: UUID,
+    current_user: CurrentUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Get a lightweight session preview with last message."""
+    try:
+        chat_service = ChatService(db)
+        
+        preview = await chat_service.get_session_preview(
+            session_id=session_id,
+            user_id=current_user.user_id
+        )
+        
+        if not preview:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Chat session not found"
+            )
+        
+        return {
+            "status": "success",
+            "data": preview
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting session preview: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to get session preview"
+        )
+
+
+@router.post("/sessions/bulk/archive")
+async def bulk_archive_sessions(
+    session_ids: List[UUID],
+    current_user: CurrentUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Bulk archive multiple chat sessions."""
+    try:
+        if not session_ids or len(session_ids) > 100:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Provide 1-100 session IDs"
+            )
+        
+        chat_service = ChatService(db)
+        
+        archived_count = await chat_service.bulk_archive_sessions(
+            session_ids=session_ids,
+            user_id=current_user.user_id
+        )
+        
+        logger.info(f"Bulk archived {archived_count} sessions for user {current_user.user_id}")
+        
+        return {
+            "status": "success",
+            "data": {
+                "requested_count": len(session_ids),
+                "archived_count": archived_count,
+                "message": f"Successfully archived {archived_count} sessions"
+            }
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error bulk archiving sessions: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to bulk archive sessions"
+        )
+
+
+@router.post("/cleanup")
+async def cleanup_old_sessions(
+    current_user: CurrentUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    days_old: int = Query(90, ge=1, le=365),
+    max_sessions: int = Query(1000, ge=1, le=5000)
+):
+    """Clean up old sessions for better performance."""
+    try:
+        chat_service = ChatService(db)
+        
+        cleaned_count = await chat_service.cleanup_old_sessions(
+            user_id=current_user.user_id,
+            tenant_id=current_user.tenant_id,
+            days_old=days_old,
+            max_sessions=max_sessions
+        )
+        
+        logger.info(f"Cleaned up {cleaned_count} sessions for user {current_user.user_id}")
+        
+        return {
+            "status": "success",
+            "data": {
+                "cleaned_count": cleaned_count,
+                "days_old": days_old,
+                "message": f"Cleaned up {cleaned_count} sessions older than {days_old} days"
+            }
+        }
+    
+    except Exception as e:
+        logger.error(f"Error cleaning up sessions: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to clean up sessions"
+        )
+
+
+@router.post("/completions/with-files", response_model=ChatCompletionResponse)
+async def create_chat_completion_with_files(
+    message: str,
+    files: List[UploadFile],
+    current_user: CurrentUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    session_id: Optional[UUID] = None,
+    stream: bool = False,
+    process_uploaded_files: bool = True,
+    include_documents: bool = True
+):
+    """Generate a chat completion with file uploads support."""
+    try:
+        from datetime import datetime
+        from models.chat import ChatMessage
+        from services.document_service import DocumentService
+        from fastapi import UploadFile
+        
+        if len(files) > 10:  # Limit file uploads
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Maximum 10 files allowed per message"
+            )
+        
+        chat_service = ChatService(db)
+        doc_service = DocumentService(db)
+        
+        # Get or create session
+        if session_id:
+            session = await chat_service.get_session(
+                session_id=session_id,
+                user_id=current_user.user_id
+            )
+            if not session:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Chat session not found"
+                )
+        else:
+            # Create new session
+            session = await chat_service.create_session(
+                user_id=current_user.user_id,
+                tenant_id=current_user.tenant_id,
+                title=f"Chat with {len(files)} file(s)"
+            )
+        
+        uploaded_documents = []
+        
+        # Process uploaded files
+        for file in files:
+            try:
+                # Upload document to session
+                document = await doc_service.upload_document(
+                    file=file,
+                    user_id=current_user.user_id,
+                    tenant_id=current_user.tenant_id,
+                    session_id=session.id
+                )
+                uploaded_documents.append(document)
+                
+                # Auto-process for RAG if enabled
+                if process_uploaded_files:
+                    await doc_service.process_document(document.id)
+                
+                logger.info(f"Uploaded and processed document {document.id} to session {session.id}")
+                
+            except Exception as e:
+                logger.error(f"Error processing uploaded file {file.filename}: {e}")
+                # Continue with other files
+        
+        # Create user message with file references
+        file_info = [{
+            "filename": doc.filename,
+            "id": str(doc.id),
+            "processed": doc.processed
+        } for doc in uploaded_documents]
+        
+        user_message = ChatMessage(
+            session_id=session.id,
+            user_id=current_user.user_id,
+            message=message,
+            message_type=MessageType.USER,
+            timestamp=datetime.now(),
+            metadata={
+                "uploaded_files": file_info,
+                "file_count": len(uploaded_documents)
+            }
+        )
+        
+        # Save user message
+        user_message = await chat_service.save_message(user_message)
+        
+        # Broadcast user message via WebSocket with file info
+        await websocket_manager.broadcast_chat_message({
+            "id": str(user_message.id),
+            "session_id": str(session.id),
+            "user_id": str(current_user.user_id),
+            "message": message,
+            "message_type": "user",
+            "timestamp": user_message.timestamp.isoformat(),
+            "uploaded_files": file_info
+        }, str(session.id))
+        
+        # Generate AI response (will include uploaded documents in context)
+        ai_response = await chat_service.generate_response(
+            message=message,
+            session_id=session.id,
+            user_id=current_user.user_id,
+            tenant_id=current_user.tenant_id,
+            include_documents=include_documents
+        )
+        
+        if not ai_response:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to generate AI response"
+            )
+        
+        # Create AI message
+        ai_message = ChatMessage(
+            session_id=session.id,
+            user_id=None,  # AI assistant has no user_id
+            message=ai_response,
+            message_type=MessageType.ASSISTANT,
+            timestamp=datetime.now(),
+            metadata={
+                "model": "default",
+                "tenant_id": str(current_user.tenant_id),
+                "used_documents": len(uploaded_documents) if include_documents else 0
+            }
+        )
+        
+        # Save AI message
+        ai_message = await chat_service.save_message(ai_message)
+        
+        # Broadcast AI message via WebSocket
+        await websocket_manager.broadcast_chat_message({
+            "id": str(ai_message.id),
+            "session_id": str(session.id),
+            "user_id": None,
+            "message": ai_response,
+            "message_type": "assistant",
+            "timestamp": ai_message.timestamp.isoformat(),
+            "metadata": ai_message.metadata
+        }, str(session.id))
+        
+        logger.info(f"Generated chat completion with {len(uploaded_documents)} files for session {session.id}")
+        
+        return ChatCompletionResponse(
+            session_id=session.id,
+            user_message_id=user_message.id,
+            assistant_message_id=ai_message.id,
+            response=ai_response,
+            tokens_used=ai_message.tokens_used,
+            processing_time_ms=ai_message.processing_time_ms,
+            model_info=ai_message.metadata
+        )
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error creating chat completion with files: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to create chat completion with files"
+        )
+
+
+@router.get("/sessions/{session_id}/documents")
+async def get_session_documents(
+    session_id: UUID,
+    current_user: CurrentUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Get documents uploaded to a specific chat session."""
+    try:
+        from services.document_service import DocumentService
+        
+        # Verify session access
+        chat_service = ChatService(db)
+        session = await chat_service.get_session(
+            session_id=session_id,
+            user_id=current_user.user_id
+        )
+        
+        if not session:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Chat session not found"
+            )
+        
+        # Get session documents
+        doc_service = DocumentService(db)
+        documents = await doc_service.get_user_documents(
+            user_id=current_user.user_id,
+            tenant_id=current_user.tenant_id,
+            session_id=session_id
+        )
+        
+        return {
+            "status": "success",
+            "data": {
+                "session_id": str(session_id),
+                "documents": [{
+                    "id": str(doc.id),
+                    "filename": doc.filename,
+                    "content_type": doc.content_type,
+                    "file_size": doc.file_size,
+                    "processed": doc.processed,
+                    "chunks_count": doc.chunks_count,
+                    "uploaded_at": doc.uploaded_at.isoformat(),
+                    "processed_at": doc.processed_at.isoformat() if doc.processed_at else None
+                } for doc in documents],
+                "total_documents": len(documents)
+            }
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting session documents: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to get session documents"
+        )
+
+
+@router.delete("/sessions/{session_id}/documents/{document_id}")
+async def remove_document_from_session(
+    session_id: UUID,
+    document_id: UUID,
+    current_user: CurrentUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Remove a document from a chat session."""
+    try:
+        from services.document_service import DocumentService
+        
+        # Verify session access
+        chat_service = ChatService(db)
+        session = await chat_service.get_session(
+            session_id=session_id,
+            user_id=current_user.user_id
+        )
+        
+        if not session:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Chat session not found"
+            )
+        
+        # Delete document (will also remove from session)
+        doc_service = DocumentService(db)
+        success = await doc_service.delete_document(
+            document_id=document_id,
+            user_id=current_user.user_id
+        )
+        
+        if not success:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Document not found"
+            )
+        
+        logger.info(f"Removed document {document_id} from session {session_id}")
+        
+        return {
+            "status": "success",
+            "message": "Document removed from session successfully"
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error removing document from session: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to remove document from session"
         )
 
 
