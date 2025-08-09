@@ -159,7 +159,7 @@ class TestThemeService:
         mock_db_session.rollback = AsyncMock()
 
         # Act & Assert
-        with pytest.raises(Exception):
+        with pytest.raises(Exception, match="Database error"):
             await theme_service.create_theme(sample_theme_create)
 
         mock_db_session.rollback.assert_called_once()
