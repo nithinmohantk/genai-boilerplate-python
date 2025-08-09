@@ -178,10 +178,28 @@ DEBUG=true
 ```
 
 ### Multi-Model Configuration
-Each tenant can configure their own AI provider keys through the admin panel:
-- **OpenAI**: GPT-4, GPT-3.5 Turbo, GPT-3.5 Turbo 16K
-- **Anthropic**: Claude 3 (Haiku, Sonnet, Opus)  
-- **Google**: Gemini Pro, Gemini Pro Vision
+Each tenant can configure their own AI provider keys through the admin panel with support for the latest AI models:
+
+#### **OpenAI Models**
+- **GPT-4 Series**: GPT-4, GPT-4 Turbo, GPT-4o, GPT-4o Mini, GPT-4.1, GPT-4.1 Mini, GPT-4.1 Nano
+- **GPT-3.5 Series**: GPT-3.5 Turbo, GPT-3.5 Turbo 16K
+- **GPT-5 Series**: GPT-5, GPT-5.0 Mini, GPT-5.0 Nano ✨ **Latest Release**
+- **Open Source**: GPT-OSS 20B
+
+#### **Anthropic Models**
+- **Claude 3 Series**: Claude 3 Haiku, Claude 3 Sonnet, Claude 3 Opus
+- **Claude 3.5 Series**: Claude 3.5 Sonnet, Claude 3.5 Haiku
+- **Claude 3.7 Series**: Claude 3.7 Sonnet ✨ **Latest Release**
+- **Claude 4.0 Series**: Claude 4.0 Opus, Claude 4.0 Sonnet ✨ **Latest Release**
+
+#### **Google Models**
+- **Gemini 1.5 Series**: Gemini 1.5 Flash, Gemini 1.5 Pro
+- **Gemini 2.5 Series**: Gemini 2.5 Flash, Gemini 2.5 Pro (Latest)
+- **Legacy Models**: Gemini Pro, Gemini Pro Vision
+
+#### **Additional Providers**
+- **Azure OpenAI**: GPT-4, GPT-4 Turbo, GPT-3.5 Turbo
+- **Hugging Face**: DialoGPT, Llama 2 (7B/13B/70B), Mistral 7B Instruct
 - **Custom**: Any OpenAI-compatible API
 
 ## 🎭 User Roles & Permissions
@@ -266,6 +284,26 @@ docker build -t genai-frontend ./frontend
 docker run -p 8000:8000 genai-backend
 docker run -p 3000:3000 genai-frontend
 ```
+
+### Docker Hub Integration
+
+This project includes Docker Hub integration with pre-configured build and push scripts for the `thingxcloud` account:
+
+```bash
+# Build production images locally (no push)
+make docker-build-prod
+
+# Build and push to Docker Hub (requires Docker Hub login)
+make docker-push
+
+# Or use the script directly
+./scripts/docker-push.sh --build-only  # Build only
+./scripts/docker-push.sh               # Build and push
+```
+
+**Available Images:**
+- `thingxcloud/genai-boilerplate-python-backend:latest`
+- `thingxcloud/genai-boilerplate-python-frontend:latest`
 
 ### Production Deployment
 ```bash

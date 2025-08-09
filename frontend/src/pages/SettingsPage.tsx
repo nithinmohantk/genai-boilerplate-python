@@ -15,11 +15,17 @@ import {
   Slider,
   Card,
   CardContent,
+  Chip,
 } from '@mui/material';
 import {
   Save as SaveIcon,
   RestoreFromTrash as ResetIcon,
+  LightMode as LightModeIcon,
+  DarkMode as DarkModeIcon,
+  SettingsBrightness as AutoModeIcon,
 } from '@mui/icons-material';
+import { useTheme as useCustomTheme } from '../contexts/ThemeContext';
+import DarkModeToggle from '../components/DarkModeToggle';
 
 interface Settings {
   // AI Model Settings
@@ -45,6 +51,8 @@ interface Settings {
 }
 
 const SettingsPage: React.FC = () => {
+  const { mode: currentTheme, setTheme, isDark } = useCustomTheme();
+  
   const [settings, setSettings] = useState<Settings>({
     aiProvider: 'openai',
     model: 'gpt-3.5-turbo',
@@ -107,11 +115,63 @@ const SettingsPage: React.FC = () => {
   ];
 
   const modelsByProvider: Record<string, string[]> = {
-    openai: ['gpt-4', 'gpt-3.5-turbo', 'gpt-4-turbo'],
-    anthropic: ['claude-3-haiku-20240307', 'claude-3-sonnet-20240229', 'claude-3-opus-20240229'],
-    google: ['gemini-pro', 'gemini-pro-vision'],
-    azure: ['gpt-4', 'gpt-35-turbo'],
-    huggingface: ['microsoft/DialoGPT-medium', 'microsoft/DialoGPT-large'],
+    openai: [
+      // GPT-4 Models
+      'gpt-4',
+      'gpt-4-turbo', 
+      'gpt-4o',
+      'gpt-4o-mini',
+      'gpt-4.1',
+      'gpt-4.1-mini',
+      'gpt-4.1-nano',
+      // GPT-3.5 Models
+      'gpt-3.5-turbo',
+      'gpt-3.5-turbo-16k',
+      // GPT-5 Models ✨ Latest Release
+      'gpt-5',
+      'gpt-5.0-mini',
+      'gpt-5.0-nano',
+      // Open Source
+      'gpt-oss-20b'
+    ],
+    anthropic: [
+      // Claude 3 Models
+      'claude-3-haiku-20240307',
+      'claude-3-sonnet-20240229', 
+      'claude-3-opus-20240229',
+      // Claude 3.5 Models
+      'claude-3-5-sonnet-20241022',
+      'claude-3-5-haiku-20241022',
+      // Claude 3.7 Models ✨ Latest Release
+      'claude-3-7-sonnet',
+      // Claude 4.0 Models ✨ Latest Release
+      'claude-4-0-opus',
+      'claude-4-0-sonnet'
+    ],
+    google: [
+      // Gemini 1.5 Models
+      'gemini-1.5-flash',
+      'gemini-1.5-pro',
+      // Gemini 2.5 Models (Latest)
+      'gemini-2.5-flash', 
+      'gemini-2.5-pro',
+      // Legacy Models
+      'gemini-pro',
+      'gemini-pro-vision'
+    ],
+    azure: [
+      'gpt-4',
+      'gpt-4-turbo',
+      'gpt-35-turbo'
+    ],
+    huggingface: [
+      'microsoft/DialoGPT-medium',
+      'microsoft/DialoGPT-large',
+      'meta-llama/Llama-2-7b-chat-hf',
+      'meta-llama/Llama-2-13b-chat-hf',
+      'meta-llama/Llama-2-70b-chat-hf',
+      'mistralai/Mistral-7B-Instruct-v0.1'
+    ],
   };
 
   return (
@@ -310,27 +370,66 @@ const SettingsPage: React.FC = () => {
           </Card>
         </Box>
 
-        {/* UI Settings */}
+        {/* Theme & UI Settings */}
         <Box>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                Interface Preferences
+                🌙 Theme & Interface
               </Typography>
+              
+              {/* Theme Selection */}
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="subtitle2" gutterBottom>
+                  Theme Mode
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+                  <Chip
+                    icon={<LightModeIcon />}
+                    label="Light"
+                    clickable
+                    color={currentTheme === 'light' ? 'primary' : 'default'}
+                    onClick={() => setTheme('light')}
+                    sx={{ transition: 'all 0.2s ease-in-out' }}
+                  />
+                  <Chip
+                    icon={<DarkModeIcon />}
+                    label="Dark"
+                    clickable
+                    color={currentTheme === 'dark' ? 'primary' : 'default'}
+                    onClick={() => setTheme('dark')}
+                    sx={{ transition: 'all 0.2s ease-in-out' }}
+                  />
+                  <Chip
+                    icon={<AutoModeIcon />}
+                    label="Auto"
+                    clickable
+                    color={currentTheme === 'auto' ? 'primary' : 'default'}
+                    onClick={() => setTheme('auto')}
+                    sx={{ transition: 'all 0.2s ease-in-out' }}
+                  />
+                </Box>
+                <Typography variant="caption" color="text.secondary">
+                  {currentTheme === 'auto' 
+                    ? `Currently using ${isDark ? 'dark' : 'light'} based on system preference`
+                    : `Using ${currentTheme} theme`
+                  }
+                </Typography>
+              </Box>
 
-              <FormControl fullWidth sx={{ mb: 2 }}>
-                <InputLabel>Theme</InputLabel>
-                <Select
-                  value={settings.theme}
-                  onChange={(e) => handleInputChange('theme', e.target.value)}
-                  label="Theme"
-                >
-                  <MenuItem value="light">Light</MenuItem>
-                  <MenuItem value="dark">Dark</MenuItem>
-                  <MenuItem value="auto">Auto</MenuItem>
-                </Select>
-              </FormControl>
+              {/* Quick Theme Toggle */}
+              <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Typography variant="subtitle2">
+                  Quick Toggle
+                </Typography>
+                <DarkModeToggle size="large" showTooltip={false} />
+              </Box>
 
+              {/* Interface Options */}
+              <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>
+                Interface Options
+              </Typography>
+              
               <FormControlLabel
                 control={
                   <Switch
@@ -339,7 +438,7 @@ const SettingsPage: React.FC = () => {
                   />
                 }
                 label="Auto-scroll to latest message"
-                sx={{ mb: 2, display: 'block' }}
+                sx={{ mb: 1, display: 'block' }}
               />
 
               <FormControlLabel
@@ -350,8 +449,12 @@ const SettingsPage: React.FC = () => {
                   />
                 }
                 label="Show message timestamps"
-                sx={{ mb: 2, display: 'block' }}
+                sx={{ mb: 1, display: 'block' }}
               />
+              
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
+                Theme preference is saved automatically and syncs across all your devices.
+              </Typography>
             </CardContent>
           </Card>
         </Box>
