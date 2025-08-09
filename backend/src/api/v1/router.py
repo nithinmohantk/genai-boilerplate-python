@@ -6,7 +6,9 @@ from fastapi import APIRouter
 
 # Import routers
 from api.auth import router as auth_router
-# from api.v1.endpoints import chat, documents, health, admin
+from api.chat import router as chat_router
+from api.documents import router as documents_router
+from api.admin import router as admin_router
 
 # Create main API router
 api_router = APIRouter()
@@ -46,8 +48,6 @@ async def status():
 
 # Include routers
 api_router.include_router(auth_router, prefix="/auth", tags=["Authentication"])
-
-# TODO: Include other routers when created
-# api_router.include_router(chat.router, prefix="/chat", tags=["chat"])
-# api_router.include_router(documents.router, prefix="/documents", tags=["documents"])
-# api_router.include_router(admin.router, prefix="/admin", tags=["admin"])
+api_router.include_router(chat_router, prefix="/chat", tags=["Chat"])
+api_router.include_router(documents_router, prefix="/documents", tags=["Documents"])
+api_router.include_router(admin_router, prefix="/admin", tags=["Admin"])

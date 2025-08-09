@@ -321,9 +321,25 @@ class ChatService:
                     session_id, message, tenant_id
                 )
 
-            # TODO: Implement actual AI client integration
-            # For now, return a mock response
-            response = f"This is a mock response to: {message}"
+            # Use GenAI client to generate response
+            from core.genai_client import genai_client
+            
+            # Format messages for AI API
+            formatted_messages = genai_client.format_messages(
+                user_message=message,
+                context_messages=context_messages,
+                system_prompt=session.system_prompt,
+                document_context=document_context
+            )
+            
+            # Generate AI response
+            response = await genai_client.generate_response(
+                messages=formatted_messages,
+                model=model_config.get("model") if model_config else None,
+                temperature=model_config.get("temperature") if model_config else None,
+                max_tokens=model_config.get("max_tokens") if model_config else None,
+                document_context=document_context
+            )
 
             logger.info(f"Generated response for session {session_id}")
             return response
@@ -341,9 +357,39 @@ class ChatService:
     ) -> str:
         """Get relevant document context for the query."""
         try:
-            # TODO: Implement vector search for document chunks
-            # For now, return empty context
-            return ""
+            from services.document_service import DocumentService
+            
+            # Get session to find user_id
+            session_query = (
+                select(ChatSession)
+                .where(ChatSession.id == session_id)
+            )
+            session_result = await self.db.execute(session_query)
+            session = session_result.scalar_one_or_none()
+            
+            if not session:
+                return ""
+            
+            # Search for relevant document chunks
+            doc_service = DocumentService(self.db)
+            chunks = await doc_service.search_documents(
+                query=query,
+                user_id=session.user_id,
+                tenant_id=tenant_id,
+                limit=max_chunks
+            )
+            
+            if not chunks:
+                return ""
+            
+            # Combine chunks into context
+            context_parts = []
+            for chunk in chunks:
+                context_parts.append(f"[Document: {chunk.document.filename if hasattr(chunk, 'document') else 'Unknown'}]")
+                context_parts.append(chunk.content)
+                context_parts.append("")
+            
+            return "\n".join(context_parts)
 
         except Exception as e:
             logger.error(f"Error getting document context: {e}")
