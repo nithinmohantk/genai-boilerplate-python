@@ -134,9 +134,9 @@ const SettingsPage: React.FC = () => {
         </Alert>
       )}
 
-      <Grid container spacing={3}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
         {/* AI Model Settings */}
-        <Grid item xs={12} md={6}>
+        <Box>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -202,10 +202,10 @@ const SettingsPage: React.FC = () => {
               />
             </CardContent>
           </Card>
-        </Grid>
+        </Grid2>
 
         {/* RAG Settings */}
-        <Grid item xs={12} md={6}>
+        <Grid2 xs={12} md={6}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -277,10 +277,10 @@ const SettingsPage: React.FC = () => {
               </Box>
             </CardContent>
           </Card>
-        </Grid>
+        </Grid2>
 
         {/* Chat Settings */}
-        <Grid item xs={12} md={6}>
+        <Grid2 xs={12} md={6}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -309,10 +309,10 @@ const SettingsPage: React.FC = () => {
               />
             </CardContent>
           </Card>
-        </Grid>
+        </Grid2>
 
         {/* UI Settings */}
-        <Grid item xs={12} md={6}>
+        <Grid2 xs={12} md={6}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -355,8 +355,8 @@ const SettingsPage: React.FC = () => {
               />
             </CardContent>
           </Card>
-        </Grid>
-      </Grid>
+        </Grid2>
+      </Grid2>
 
       {/* Action Buttons */}
       <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>

@@ -64,7 +64,7 @@ const ChatPage: React.FC = () => {
     setTimeout(() => {
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: `I received your message: \"${userMessage.content}\". This is a placeholder response. The actual GenAI integration will be implemented with the backend API.`,
+        content: `I received your message: "${userMessage.content}". This is a placeholder response. The actual GenAI integration will be implemented with the backend API.`,
         sender: 'bot',
         timestamp: new Date(),
       };
