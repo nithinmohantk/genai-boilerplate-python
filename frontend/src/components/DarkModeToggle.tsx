@@ -5,7 +5,7 @@ import {
   DarkMode as DarkModeIcon,
   SettingsBrightness as AutoModeIcon,
 } from '@mui/icons-material';
-import { useTheme } from '../contexts/ThemeContext';
+import { useTheme } from '../contexts/useTheme';
 
 interface DarkModeToggleProps {
   size?: 'small' | 'medium' | 'large';

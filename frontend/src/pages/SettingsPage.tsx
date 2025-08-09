@@ -24,7 +24,7 @@ import {
   DarkMode as DarkModeIcon,
   SettingsBrightness as AutoModeIcon,
 } from '@mui/icons-material';
-import { useTheme as useCustomTheme } from '../contexts/ThemeContext';
+import { useTheme as useCustomTheme } from '../contexts/useTheme';
 import DarkModeToggle from '../components/DarkModeToggle';
 
 interface Settings {

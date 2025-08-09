@@ -1,12 +1,9 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
-import { CssBaseline } from '@mui/material';
-import type { PaletteMode } from '@mui/material';
 import {
   type ThemeMode,
   getThemeConfig,
-  getSystemTheme,
   getEffectiveMode,
 } from './theme-constants';
 
@@ -19,15 +16,6 @@ interface ThemeContextType {
 
 // Create the context
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
-
-// Custom hook to use the theme context
-export const useTheme = () => {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error('useTheme must be used within a ThemeContextProvider');
-  }
-  return context;
-};
 
 // Export the ThemeMode type for external use
 export type { ThemeMode };
