@@ -11,7 +11,6 @@ import {
   Switch,
   FormControlLabel,
   Button,
-  Divider,
   Alert,
   Slider,
   Grid,
@@ -68,7 +67,7 @@ const SettingsPage: React.FC = () => {
 
   const [saveSuccess, setSaveSuccess] = useState(false);
 
-  const handleInputChange = (field: keyof Settings, value: any) => {
+  const handleInputChange = (field: keyof Settings, value: string | number | boolean) => {
     setSettings(prev => ({ ...prev, [field]: value }));
   };
 
