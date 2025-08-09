@@ -479,12 +479,12 @@ class TestThemeService:
         mock_row1.display_name = "Theme 1"
         mock_row1.usage_count = 100
         mock_row1.category = "professional"
-        
+
         mock_row2 = Mock()
         mock_row2.display_name = "Theme 2"
         mock_row2.usage_count = 50
         mock_row2.category = "creative"
-        
+
         mock_popular_result = Mock()
         mock_popular_result.fetchall.return_value = [mock_row1, mock_row2]
 
