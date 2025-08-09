@@ -45,18 +45,18 @@ class MockThemeService:
 
     async def create_theme(self, theme_data, is_system=False):
         # Simulate creating a theme
-        if hasattr(theme_data, 'model_dump'):
+        if hasattr(theme_data, "model_dump"):
             theme_dict = theme_data.model_dump()
-        elif hasattr(theme_data, 'dict'):
+        elif hasattr(theme_data, "dict"):
             theme_dict = theme_data.dict()
         else:
             theme_dict = theme_data if isinstance(theme_data, dict) else {}
-        
+
         theme_dict["id"] = f"theme_{len(self.themes) + 1}"
         theme_dict["is_system"] = is_system
-        
+
         # Create a mock theme object that supports attribute access
-        mock_theme = type('MockTheme', (object,), theme_dict)()
+        mock_theme = type("MockTheme", (object,), theme_dict)()
 
         self.themes.append(mock_theme)
         return mock_theme

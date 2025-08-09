@@ -966,13 +966,12 @@ async def remove_document_from_session(
 async def get_available_models(
     current_user: CurrentUser = Depends(get_current_user),
     provider: str = Query(
-        "all", 
+        "all",
         description="AI provider to get models for",
-        regex="^(all|openai|anthropic|google|azure_openai|huggingface)$"
+        regex="^(all|openai|anthropic|google|azure_openai|huggingface)$",
     ),
     include_experimental: bool = Query(
-        False, 
-        description="Include experimental/future models"
+        False, description="Include experimental/future models"
     ),
 ):
     """Get available AI models for a provider."""
@@ -980,18 +979,17 @@ async def get_available_models(
         from core.genai_client import genai_client
 
         models = await genai_client.get_available_models(
-            provider=provider, 
-            include_experimental=include_experimental
+            provider=provider, include_experimental=include_experimental
         )
 
         return {
-            "status": "success", 
+            "status": "success",
             "data": {
-                "provider": provider, 
+                "provider": provider,
                 "models": models,
                 "total_models": len(models),
-                "include_experimental": include_experimental
-            }
+                "include_experimental": include_experimental,
+            },
         }
 
     except Exception as e:
@@ -1012,11 +1010,11 @@ async def get_model_details(
         from core.genai_client import genai_client
 
         model_info = genai_client.get_model_details(model_id)
-        
+
         if not model_info:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Model '{model_id}' not found"
+                detail=f"Model '{model_id}' not found",
             )
 
         return {
@@ -1028,14 +1026,16 @@ async def get_model_details(
                     "provider": model_info["provider"].value,
                     "context_window": model_info["context_window"],
                     "max_tokens": model_info["max_tokens"],
-                    "capabilities": [cap.value for cap in model_info.get("capabilities", [])],
+                    "capabilities": [
+                        cap.value for cap in model_info.get("capabilities", [])
+                    ],
                     "supports_streaming": model_info.get("supports_streaming", False),
                     "experimental": model_info.get("experimental", False),
                     "open_source": model_info.get("open_source", False),
                     "cost_per_1k_input": model_info.get("cost_per_1k_input", 0),
                     "cost_per_1k_output": model_info.get("cost_per_1k_output", 0),
-                }
-            }
+                },
+            },
         }
 
     except HTTPException:
@@ -1060,10 +1060,7 @@ async def get_supported_providers(
 
         return {
             "status": "success",
-            "data": {
-                "providers": providers,
-                "total_providers": len(providers)
-            }
+            "data": {"providers": providers, "total_providers": len(providers)},
         }
 
     except Exception as e:
@@ -1090,8 +1087,8 @@ async def get_models_by_capability(
             "data": {
                 "capability": capability,
                 "models": models,
-                "total_models": len(models)
-            }
+                "total_models": len(models),
+            },
         }
 
     except Exception as e:

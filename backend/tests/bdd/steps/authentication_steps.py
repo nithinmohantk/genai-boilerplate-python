@@ -1,40 +1,39 @@
 """
 BDD Step definitions for authentication feature tests.
 """
-import json
-import jwt
-from datetime import datetime, timedelta
-from typing import Any, Dict, Optional
 
-import pytest
-from pytest_bdd import given, when, then, parsers
-from fastapi.testclient import TestClient
-from sqlalchemy.orm import Session
-
-import sys
 import os
+import sys
+from datetime import datetime, timedelta
+from typing import Any
+
+import jwt
+import pytest
+from fastapi.testclient import TestClient
+from pytest_bdd import given, parsers, then, when
+from sqlalchemy.orm import Session
 
 # Add src to the path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../../src"))
 
-from models.auth import User, Tenant, UserRole
-from services.auth_service import AuthService
 from core.database import get_db
 from main import app
+from models.auth import Tenant, User, UserRole
+from services.auth_service import AuthService
 
 
 class AuthenticationStepContext:
     """Context to store state between BDD steps."""
-    
+
     def __init__(self):
         self.client = TestClient(app)
-        self.response: Optional[Any] = None
-        self.tokens: Dict[str, str] = {}
-        self.current_user: Optional[User] = None
-        self.error_message: Optional[str] = None
-        self.tenant: Optional[Tenant] = None
-        self.db_session: Optional[Session] = None
-        self.auth_service: Optional[AuthService] = None
+        self.response: Any | None = None
+        self.tokens: dict[str, str] = {}
+        self.current_user: User | None = None
+        self.error_message: str | None = None
+        self.tenant: Tenant | None = None
+        self.db_session: Session | None = None
+        self.auth_service: AuthService | None = None
 
 
 @pytest.fixture
@@ -60,18 +59,16 @@ def application_running(auth_context):
 def database_initialized(auth_context):
     """Ensure database is initialized and clean."""
     # Clean up any existing test data
-    auth_context.db_session.query(User).filter(User.email.contains("@example.com")).delete()
+    auth_context.db_session.query(User).filter(
+        User.email.contains("@example.com")
+    ).delete()
     auth_context.db_session.commit()
 
 
 @given(parsers.parse('a test tenant exists with name "{tenant_name}"'))
 def test_tenant_exists(auth_context, tenant_name: str):
     """Create a test tenant."""
-    tenant = Tenant(
-        name=tenant_name,
-        domain="test-company.com",
-        is_active=True
-    )
+    tenant = Tenant(name=tenant_name, domain="test-company.com", is_active=True)
     auth_context.db_session.add(tenant)
     auth_context.db_session.commit()
     auth_context.db_session.refresh(tenant)
@@ -92,7 +89,7 @@ def authenticated_as_user(auth_context):
     user_data = {
         "email": "test@example.com",
         "password": "SecurePassword123!",
-        "name": "Test User"
+        "name": "Test User",
     }
     user = create_test_user(auth_context, user_data, verified=True)
     authenticate_user(auth_context, user)
@@ -101,11 +98,7 @@ def authenticated_as_user(auth_context):
 @given(parsers.parse('I am authenticated as a user with password "{password}"'))
 def authenticated_with_password(auth_context, password: str):
     """Authenticate user with specific password."""
-    user_data = {
-        "email": "test@example.com",
-        "password": password,
-        "name": "Test User"
-    }
+    user_data = {"email": "test@example.com", "password": password, "name": "Test User"}
     user = create_test_user(auth_context, user_data, verified=True)
     authenticate_user(auth_context, user)
 
@@ -113,17 +106,17 @@ def authenticated_with_password(auth_context, password: str):
 @given("I am authenticated as a user with:", target_fixture="auth_context")
 def authenticated_user_with_details(auth_context, step_data):
     """Authenticate user with specific details from table."""
-    user_data = {row['field']: row['value'] for row in step_data}
-    
+    user_data = {row["field"]: row["value"] for row in step_data}
+
     # Set default password if not provided
-    if 'password' not in user_data:
-        user_data['password'] = 'SecurePassword123!'
-    
+    if "password" not in user_data:
+        user_data["password"] = "SecurePassword123!"
+
     # Convert role to enum if provided
     role = UserRole.USER
-    if 'role' in user_data:
-        role = UserRole(user_data['role'].upper())
-    
+    if "role" in user_data:
+        role = UserRole(user_data["role"].upper())
+
     user = create_test_user(auth_context, user_data, verified=True, role=role)
     authenticate_user(auth_context, user)
     return auth_context
@@ -135,9 +128,11 @@ def authenticated_as_admin(auth_context):
     user_data = {
         "email": "admin@example.com",
         "password": "AdminPassword123!",
-        "name": "Admin User"
+        "name": "Admin User",
     }
-    user = create_test_user(auth_context, user_data, verified=True, role=UserRole.TENANT_ADMIN)
+    user = create_test_user(
+        auth_context, user_data, verified=True, role=UserRole.TENANT_ADMIN
+    )
     authenticate_user(auth_context, user)
 
 
@@ -150,19 +145,15 @@ def authenticated_as_regular_user(auth_context):
 @given("a user exists with:")
 def user_exists_with_details(auth_context, step_data):
     """Create a user with specific details."""
-    user_data = {row['field']: row['value'] for row in step_data}
-    verified = user_data.get('verified', 'true').lower() == 'true'
+    user_data = {row["field"]: row["value"] for row in step_data}
+    verified = user_data.get("verified", "true").lower() == "true"
     create_test_user(auth_context, user_data, verified=verified)
 
 
 @given(parsers.parse('a user exists with email "{email}"'))
 def user_exists_with_email(auth_context, email: str):
     """Create a user with specific email."""
-    user_data = {
-        "email": email,
-        "password": "SecurePassword123!",
-        "name": "Test User"
-    }
+    user_data = {"email": email, "password": "SecurePassword123!", "name": "Test User"}
     create_test_user(auth_context, user_data, verified=True)
 
 
@@ -182,27 +173,31 @@ def invalid_refresh_token(auth_context):
 def authenticated_with_token_states(auth_context, step_data):
     """Set authentication tokens with specific states."""
     # Create valid tokens first
-    user = create_test_user(auth_context, {
-        "email": "test@example.com",
-        "password": "SecurePassword123!",
-        "name": "Test User"
-    }, verified=True)
-    
+    user = create_test_user(
+        auth_context,
+        {
+            "email": "test@example.com",
+            "password": "SecurePassword123!",
+            "name": "Test User",
+        },
+        verified=True,
+    )
+
     tokens = auth_context.auth_service.create_tokens(user)
-    
+
     for row in step_data:
-        token_type = row['token_type']
-        status = row['status']
-        
-        if status == 'expired':
+        token_type = row["token_type"]
+        status = row["status"]
+
+        if status == "expired":
             # Create expired token
-            if token_type == 'access_token':
-                expired_token = create_expired_token(user, token_type='access')
-                auth_context.tokens['access_token'] = expired_token
-            elif token_type == 'refresh_token':
-                expired_token = create_expired_token(user, token_type='refresh')
-                auth_context.tokens['refresh_token'] = expired_token
-        elif status == 'valid':
+            if token_type == "access_token":
+                expired_token = create_expired_token(user, token_type="access")
+                auth_context.tokens["access_token"] = expired_token
+            elif token_type == "refresh_token":
+                expired_token = create_expired_token(user, token_type="refresh")
+                auth_context.tokens["refresh_token"] = expired_token
+        elif status == "valid":
             auth_context.tokens[token_type] = tokens[token_type]
 
 
@@ -210,46 +205,47 @@ def authenticated_with_token_states(auth_context, step_data):
 @when("I register with valid credentials:")
 def register_with_valid_credentials(auth_context, step_data):
     """Register with provided credentials."""
-    registration_data = {row['field']: row['value'] for row in step_data}
-    registration_data['tenant_id'] = str(auth_context.tenant.id)
-    
-    auth_context.response = auth_context.client.post("/api/auth/register", json=registration_data)
+    registration_data = {row["field"]: row["value"] for row in step_data}
+    registration_data["tenant_id"] = str(auth_context.tenant.id)
+
+    auth_context.response = auth_context.client.post(
+        "/api/auth/register", json=registration_data
+    )
 
 
 @when("I register with invalid credentials:")
 def register_with_invalid_credentials(auth_context, step_data):
     """Register with invalid credentials."""
-    registration_data = {row['field']: row['value'] for row in step_data}
-    registration_data['tenant_id'] = str(auth_context.tenant.id)
-    
-    auth_context.response = auth_context.client.post("/api/auth/register", json=registration_data)
+    registration_data = {row["field"]: row["value"] for row in step_data}
+    registration_data["tenant_id"] = str(auth_context.tenant.id)
+
+    auth_context.response = auth_context.client.post(
+        "/api/auth/register", json=registration_data
+    )
 
 
 # Login steps
 @when("I login with correct credentials:")
 def login_with_correct_credentials(auth_context, step_data):
     """Login with correct credentials."""
-    login_data = {row['field']: row['value'] for row in step_data}
+    login_data = {row["field"]: row["value"] for row in step_data}
     auth_context.response = auth_context.client.post("/api/auth/login", json=login_data)
 
 
 @when("I login with incorrect credentials:")
 def login_with_incorrect_credentials(auth_context, step_data):
     """Login with incorrect credentials."""
-    login_data = {row['field']: row['value'] for row in step_data}
+    login_data = {row["field"]: row["value"] for row in step_data}
     auth_context.response = auth_context.client.post("/api/auth/login", json=login_data)
 
 
-@when(parsers.parse('I attempt to login {attempts:d} times with incorrect password'))
+@when(parsers.parse("I attempt to login {attempts:d} times with incorrect password"))
 def multiple_failed_login_attempts(auth_context, attempts: int):
     """Attempt multiple failed logins."""
     for i in range(attempts):
-        login_data = {
-            "email": "test@example.com",
-            "password": f"WrongPassword{i}"
-        }
+        login_data = {"email": "test@example.com", "password": f"WrongPassword{i}"}
         response = auth_context.client.post("/api/auth/login", json=login_data)
-        
+
         # Store the last response
         if i == attempts - 1:
             auth_context.response = response
@@ -260,42 +256,44 @@ def multiple_failed_login_attempts(auth_context, attempts: int):
 def access_protected_resource(auth_context, endpoint: str):
     """Access a protected resource."""
     headers = {}
-    if 'access_token' in auth_context.tokens:
-        headers['Authorization'] = f"Bearer {auth_context.tokens['access_token']}"
-    
+    if "access_token" in auth_context.tokens:
+        headers["Authorization"] = f"Bearer {auth_context.tokens['access_token']}"
+
     auth_context.response = auth_context.client.get(endpoint, headers=headers)
 
 
 @when("I refresh my tokens using the refresh token")
 def refresh_tokens(auth_context):
     """Refresh authentication tokens."""
-    refresh_data = {"refresh_token": auth_context.tokens.get('refresh_token', '')}
-    auth_context.response = auth_context.client.post("/api/auth/refresh", json=refresh_data)
+    refresh_data = {"refresh_token": auth_context.tokens.get("refresh_token", "")}
+    auth_context.response = auth_context.client.post(
+        "/api/auth/refresh", json=refresh_data
+    )
 
 
 @when("I logout")
 def logout_user(auth_context):
     """Logout current user."""
     headers = {}
-    if 'access_token' in auth_context.tokens:
-        headers['Authorization'] = f"Bearer {auth_context.tokens['access_token']}"
-    
-    auth_context.response = auth_context.client.post("/api/auth/logout", headers=headers)
+    if "access_token" in auth_context.tokens:
+        headers["Authorization"] = f"Bearer {auth_context.tokens['access_token']}"
+
+    auth_context.response = auth_context.client.post(
+        "/api/auth/logout", headers=headers
+    )
 
 
 @when("I change my password:")
 def change_password(auth_context, step_data):
     """Change user password."""
-    password_data = {row['field']: row['value'] for row in step_data}
-    
+    password_data = {row["field"]: row["value"] for row in step_data}
+
     headers = {}
-    if 'access_token' in auth_context.tokens:
-        headers['Authorization'] = f"Bearer {auth_context.tokens['access_token']}"
-    
+    if "access_token" in auth_context.tokens:
+        headers["Authorization"] = f"Bearer {auth_context.tokens['access_token']}"
+
     auth_context.response = auth_context.client.post(
-        "/api/auth/change-password", 
-        json=password_data, 
-        headers=headers
+        "/api/auth/change-password", json=password_data, headers=headers
     )
 
 
@@ -327,7 +325,7 @@ def user_exists_in_database(auth_context):
     """Assert user exists in database."""
     response_data = auth_context.response.json()
     email = response_data["user"]["email"]
-    
+
     user = auth_context.db_session.query(User).filter(User.email == email).first()
     assert user is not None
 
@@ -391,7 +389,7 @@ def tokens_are_valid(auth_context):
     # Verify access token
     access_token = auth_context.tokens.get("access_token")
     assert access_token is not None
-    
+
     try:
         # Decode without verification for testing
         payload = jwt.decode(access_token, options={"verify_signature": False})
@@ -461,11 +459,11 @@ def receive_new_access_token(auth_context):
     """Assert new access token received."""
     response_data = auth_context.response.json()
     new_access_token = response_data["access_token"]
-    
+
     # Ensure it's different from the old one
     old_access_token = auth_context.tokens.get("access_token")
     assert new_access_token != old_access_token
-    
+
     auth_context.tokens["access_token"] = new_access_token
 
 
@@ -474,11 +472,11 @@ def receive_new_refresh_token(auth_context):
     """Assert new refresh token received."""
     response_data = auth_context.response.json()
     new_refresh_token = response_data["refresh_token"]
-    
+
     # Ensure it's different from the old one
     old_refresh_token = auth_context.tokens.get("refresh_token")
     assert new_refresh_token != old_refresh_token
-    
+
     auth_context.tokens["refresh_token"] = new_refresh_token
 
 
@@ -524,35 +522,26 @@ def password_change_failed(auth_context):
     assert auth_context.response.status_code == 400
 
 
-@then(parsers.parse('I should be able to login with the new password'))
+@then(parsers.parse("I should be able to login with the new password"))
 def can_login_with_new_password(auth_context):
     """Assert can login with new password."""
-    login_data = {
-        "email": "test@example.com",
-        "password": "NewPassword123!"
-    }
+    login_data = {"email": "test@example.com", "password": "NewPassword123!"}
     response = auth_context.client.post("/api/auth/login", json=login_data)
     assert response.status_code == 200
 
 
-@then(parsers.parse('I should not be able to login with the old password'))
+@then(parsers.parse("I should not be able to login with the old password"))
 def cannot_login_with_old_password(auth_context):
     """Assert cannot login with old password."""
-    login_data = {
-        "email": "test@example.com",
-        "password": "OldPassword123!"
-    }
+    login_data = {"email": "test@example.com", "password": "OldPassword123!"}
     response = auth_context.client.post("/api/auth/login", json=login_data)
     assert response.status_code == 401
 
 
-@then(parsers.parse('I should still be able to login with the old password'))
+@then(parsers.parse("I should still be able to login with the old password"))
 def can_still_login_with_old_password(auth_context):
     """Assert can still login with old password."""
-    login_data = {
-        "email": "test@example.com",
-        "password": "OldPassword123!"
-    }
+    login_data = {"email": "test@example.com", "password": "OldPassword123!"}
     response = auth_context.client.post("/api/auth/login", json=login_data)
     assert response.status_code == 200
 
@@ -561,10 +550,12 @@ def can_still_login_with_old_password(auth_context):
 def account_locked(auth_context):
     """Assert account is temporarily locked."""
     # Check if user account is locked in database
-    user = auth_context.db_session.query(User).filter(
-        User.email == "test@example.com"
-    ).first()
-    
+    user = (
+        auth_context.db_session.query(User)
+        .filter(User.email == "test@example.com")
+        .first()
+    )
+
     assert user is not None
     # In real implementation, check for lockout timestamp or flag
 
@@ -572,13 +563,10 @@ def account_locked(auth_context):
 @then(parsers.parse('subsequent login attempts should fail with "{message}"'))
 def subsequent_logins_fail(auth_context, message: str):
     """Assert subsequent login attempts fail with specific message."""
-    login_data = {
-        "email": "test@example.com",
-        "password": "SecurePassword123!"
-    }
+    login_data = {"email": "test@example.com", "password": "SecurePassword123!"}
     response = auth_context.client.post("/api/auth/login", json=login_data)
     assert response.status_code == 423  # Locked
-    
+
     response_data = response.json()
     assert message in response_data.get("detail", "")
 
@@ -587,7 +575,9 @@ def subsequent_logins_fail(auth_context, message: str):
 def receive_lockout_duration_info(auth_context):
     """Assert lockout duration information received."""
     response_data = auth_context.response.json()
-    assert "lockout_duration" in response_data or "duration" in response_data.get("detail", "")
+    assert "lockout_duration" in response_data or "duration" in response_data.get(
+        "detail", ""
+    )
 
 
 @then("I should receive the requested admin data")
@@ -599,23 +589,28 @@ def receive_admin_data(auth_context):
 
 
 # Helper functions
-def create_test_user(auth_context, user_data: Dict[str, str], verified: bool = True, role: UserRole = UserRole.USER) -> User:
+def create_test_user(
+    auth_context,
+    user_data: dict[str, str],
+    verified: bool = True,
+    role: UserRole = UserRole.USER,
+) -> User:
     """Create a test user in the database."""
     hashed_password = auth_context.auth_service.hash_password(user_data["password"])
-    
+
     user = User(
         email=user_data["email"],
         name=user_data["name"],
         hashed_password=hashed_password,
         is_verified=verified,
         role=role,
-        tenant_id=auth_context.tenant.id
+        tenant_id=auth_context.tenant.id,
     )
-    
+
     auth_context.db_session.add(user)
     auth_context.db_session.commit()
     auth_context.db_session.refresh(user)
-    
+
     return user
 
 
@@ -626,18 +621,18 @@ def authenticate_user(auth_context, user: User):
     auth_context.current_user = user
 
 
-def create_expired_token(user: User, token_type: str = 'access') -> str:
+def create_expired_token(user: User, token_type: str = "access") -> str:
     """Create an expired JWT token for testing."""
     now = datetime.utcnow()
     exp_time = now - timedelta(hours=1)  # Expired 1 hour ago
-    
+
     payload = {
         "user_id": str(user.id),
         "email": user.email,
         "exp": exp_time,
         "iat": now - timedelta(hours=2),
-        "type": token_type
+        "type": token_type,
     }
-    
+
     # Use a dummy secret for testing
     return jwt.encode(payload, "test_secret", algorithm="HS256")

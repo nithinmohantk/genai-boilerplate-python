@@ -3,7 +3,6 @@ Pytest configuration and fixtures.
 """
 
 import sys
-import pytest
 from pathlib import Path
 
 # Add the backend root directory to Python path so config module can be imported
@@ -18,6 +17,7 @@ if str(src_root) not in sys.path:
 
 # Set up environment variables to prevent some import issues
 import os
+
 os.environ["TESTING"] = "1"
 os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
 os.environ.setdefault("SECRET_KEY", "test_secret_key")

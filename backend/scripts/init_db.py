@@ -12,9 +12,9 @@ from pathlib import Path
 backend_src = Path(__file__).parent.parent / "src"
 sys.path.insert(0, str(backend_src))
 
-from core.database import init_db, close_db
+from core.database import close_db, init_db
 from database.session import get_db
-from models.auth import Tenant, User, UserRole, TenantStatus
+from models.auth import TenantStatus, UserRole
 from services.auth_service import AuthService
 
 DEFAULT_TENANT_DOMAIN = "default"
@@ -26,19 +26,21 @@ DEFAULT_ADMIN_PASSWORD = "admin123!"
 async def create_default_data():
     """Create default tenant and admin user."""
     print("🗄️  Initializing database...")
-    
+
     # Initialize database
     await init_db()
-    
+
     print("📊 Creating default tenant and admin user...")
-    
+
     async for db in get_db():
         auth_service = AuthService(db)
-        
+
         try:
             # Check if default tenant already exists
-            existing_tenant = await auth_service.get_tenant_by_domain(DEFAULT_TENANT_DOMAIN)
-            
+            existing_tenant = await auth_service.get_tenant_by_domain(
+                DEFAULT_TENANT_DOMAIN
+            )
+
             if existing_tenant:
                 print(f"✅ Default tenant already exists: {DEFAULT_TENANT_DOMAIN}")
                 tenant = existing_tenant
@@ -51,22 +53,21 @@ async def create_default_data():
                     settings={
                         "allow_registration": True,
                         "max_users": 1000,
-                        "features": ["chat", "documents", "api_access"]
+                        "features": ["chat", "documents", "api_access"],
                     },
                     branding={
                         "primary_color": "#1976d2",
                         "logo_url": None,
-                        "company_name": DEFAULT_TENANT_NAME
-                    }
+                        "company_name": DEFAULT_TENANT_NAME,
+                    },
                 )
                 print(f"✅ Created default tenant: {tenant.domain}")
-            
+
             # Check if admin user already exists
             existing_admin = await auth_service.get_user_by_email(
-                DEFAULT_ADMIN_EMAIL, 
-                tenant.id
+                DEFAULT_ADMIN_EMAIL, tenant.id
             )
-            
+
             if existing_admin:
                 print(f"✅ Default admin user already exists: {DEFAULT_ADMIN_EMAIL}")
             else:
@@ -77,33 +78,33 @@ async def create_default_data():
                     tenant_id=tenant.id,
                     full_name="System Administrator",
                     role=UserRole.SUPER_ADMIN,
-                    is_verified=True  # Pre-verified for admin
+                    is_verified=True,  # Pre-verified for admin
                 )
                 print(f"✅ Created admin user: {admin_user.email}")
                 print(f"🔐 Admin password: {DEFAULT_ADMIN_PASSWORD}")
-            
+
             print("\n🎉 Database initialization completed successfully!")
             print("\n📋 Summary:")
             print(f"   • Tenant Domain: {tenant.domain}")
             print(f"   • Tenant ID: {tenant.id}")
             print(f"   • Admin Email: {DEFAULT_ADMIN_EMAIL}")
             print(f"   • Admin Password: {DEFAULT_ADMIN_PASSWORD}")
-            print(f"   • Login URL: http://localhost:8000/api/v1/auth/login")
-            print(f"   • API Docs: http://localhost:8000/docs")
-            
+            print("   • Login URL: http://localhost:8000/api/v1/auth/login")
+            print("   • API Docs: http://localhost:8000/docs")
+
         except Exception as e:
             print(f"❌ Error during initialization: {e}")
             raise
-        
+
         break  # Exit after first iteration
-    
+
     # Close database connections
     await close_db()
 
 
 if __name__ == "__main__":
     print("🚀 Starting database initialization...")
-    
+
     try:
         asyncio.run(create_default_data())
     except KeyboardInterrupt:
