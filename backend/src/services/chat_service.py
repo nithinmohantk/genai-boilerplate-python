@@ -520,9 +520,11 @@ class ChatService:
                         "created_at": row.ChatSession.created_at.isoformat(),
                         "updated_at": row.ChatSession.updated_at.isoformat(),
                         "message_count": row.message_count,
-                        "last_message_at": row.last_message_at.isoformat()
-                        if row.last_message_at
-                        else None,
+                        "last_message_at": (
+                            row.last_message_at.isoformat()
+                            if row.last_message_at
+                            else None
+                        ),
                     }
                     sessions.append(session_dict)
             else:
@@ -701,9 +703,9 @@ class ChatService:
                 "created_at": row.ChatSession.created_at.isoformat(),
                 "updated_at": row.ChatSession.updated_at.isoformat(),
                 "last_message": row.last_message,
-                "last_message_at": row.last_message_at.isoformat()
-                if row.last_message_at
-                else None,
+                "last_message_at": (
+                    row.last_message_at.isoformat() if row.last_message_at else None
+                ),
                 "message_count": row.message_count,
             }
 

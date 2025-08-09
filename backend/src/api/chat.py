@@ -892,9 +892,9 @@ async def get_session_documents(
                         "processed": doc.processed,
                         "chunks_count": doc.chunks_count,
                         "uploaded_at": doc.uploaded_at.isoformat(),
-                        "processed_at": doc.processed_at.isoformat()
-                        if doc.processed_at
-                        else None,
+                        "processed_at": (
+                            doc.processed_at.isoformat() if doc.processed_at else None
+                        ),
                     }
                     for doc in documents
                 ],

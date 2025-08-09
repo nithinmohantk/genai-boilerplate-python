@@ -223,9 +223,9 @@ async def get_tenant_stats(
                 "chat": {
                     "sessions": session_count,
                     "messages": message_count,
-                    "avg_messages_per_session": message_count / session_count
-                    if session_count > 0
-                    else 0,
+                    "avg_messages_per_session": (
+                        message_count / session_count if session_count > 0 else 0
+                    ),
                 },
                 "api_keys": api_key_count,
             },

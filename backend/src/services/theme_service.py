@@ -271,9 +271,9 @@ class ThemeService:
 
             # Create backup of current settings
             settings.settings_backup = {
-                "active_theme_id": str(settings.active_theme_id)
-                if settings.active_theme_id
-                else None,
+                "active_theme_id": (
+                    str(settings.active_theme_id) if settings.active_theme_id else None
+                ),
                 "display_mode": settings.display_mode,
                 "font_size": settings.font_size,
                 "font_family": settings.font_family,
