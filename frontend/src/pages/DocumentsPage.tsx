@@ -7,7 +7,6 @@ import {
   Card,
   CardContent,
   CardActions,
-  Grid2,
   Chip,
   IconButton,
   Dialog,
@@ -164,9 +163,19 @@ const DocumentsPage: React.FC = () => {
       </Paper>
 
       {/* Documents Grid */}
-      <Grid2 container spacing={2}>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: '1fr',
+            sm: 'repeat(2, 1fr)',
+            md: 'repeat(3, 1fr)',
+          },
+          gap: 2,
+        }}
+      >
         {documents.map((document) => (
-          <Grid2 xs={12} sm={6} md={4} key={document.id}>
+          <Box key={document.id}>
             <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <CardContent sx={{ flexGrow: 1 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -228,9 +237,9 @@ const DocumentsPage: React.FC = () => {
                 </IconButton>
               </CardActions>
             </Card>
-          </Grid2>
+          </Box>
         ))}
-      </Grid2>
+      </Box>
 
       {/* Upload Dialog */}
       <Dialog open={uploadDialogOpen} onClose={() => setUploadDialogOpen(false)} maxWidth="sm" fullWidth>

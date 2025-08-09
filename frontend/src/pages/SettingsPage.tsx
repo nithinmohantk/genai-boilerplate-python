@@ -13,7 +13,6 @@ import {
   Button,
   Alert,
   Slider,
-  Grid,
   Card,
   CardContent,
 } from '@mui/material';
@@ -202,10 +201,10 @@ const SettingsPage: React.FC = () => {
               />
             </CardContent>
           </Card>
-        </Grid2>
+        </Box>
 
         {/* RAG Settings */}
-        <Grid2 xs={12} md={6}>
+        <Box>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -277,10 +276,10 @@ const SettingsPage: React.FC = () => {
               </Box>
             </CardContent>
           </Card>
-        </Grid2>
+        </Box>
 
         {/* Chat Settings */}
-        <Grid2 xs={12} md={6}>
+        <Box>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -309,10 +308,10 @@ const SettingsPage: React.FC = () => {
               />
             </CardContent>
           </Card>
-        </Grid2>
+        </Box>
 
         {/* UI Settings */}
-        <Grid2 xs={12} md={6}>
+        <Box>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -355,8 +354,8 @@ const SettingsPage: React.FC = () => {
               />
             </CardContent>
           </Card>
-        </Grid2>
-      </Grid2>
+        </Box>
+      </Box>
 
       {/* Action Buttons */}
       <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
