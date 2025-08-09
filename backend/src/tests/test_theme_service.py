@@ -474,11 +474,19 @@ class TestThemeService:
     async def test_get_theme_usage_stats(self, theme_service, mock_db_session):
         """Test getting theme usage statistics."""
         # Arrange
+        # Create mock row objects with attributes (not tuples)
+        mock_row1 = Mock()
+        mock_row1.display_name = "Theme 1"
+        mock_row1.usage_count = 100
+        mock_row1.category = "professional"
+        
+        mock_row2 = Mock()
+        mock_row2.display_name = "Theme 2"
+        mock_row2.usage_count = 50
+        mock_row2.category = "creative"
+        
         mock_popular_result = Mock()
-        mock_popular_result.fetchall.return_value = [
-            ("Theme 1", 100, "professional"),
-            ("Theme 2", 50, "creative"),
-        ]
+        mock_popular_result.fetchall.return_value = [mock_row1, mock_row2]
 
         mock_category_result = Mock()
         mock_category_result.fetchall.return_value = [
@@ -503,8 +511,12 @@ class TestThemeService:
         assert "total_themes" in result
         assert "themes_by_category" in result
         assert "popular_themes" in result
+        assert "system_themes" in result
         assert result["total_themes"] == 8
         assert len(result["popular_themes"]) == 2
+        assert result["popular_themes"][0]["name"] == "Theme 1"
+        assert result["popular_themes"][0]["usage_count"] == 100
+        assert result["popular_themes"][0]["category"] == "professional"
 
 
 class TestThemeServiceUserSettings:
