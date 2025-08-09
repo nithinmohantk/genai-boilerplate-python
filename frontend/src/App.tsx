@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import { CustomThemeProvider } from './contexts/ThemeContext';
 import Layout from './components/Layout';
 import ChatPage from './pages/ChatPage';
 import DocumentsPage from './pages/DocumentsPage';
@@ -18,33 +18,10 @@ const queryClient = new QueryClient({
   },
 });
 
-// Create Material-UI theme
-const theme = createTheme({
-  palette: {
-    mode: 'light',
-    primary: {
-      main: '#3b82f6',
-    },
-    secondary: {
-      main: '#8b5cf6',
-    },
-    background: {
-      default: '#f8fafc',
-      paper: '#ffffff',
-    },
-  },
-  typography: {
-    fontFamily: 'Inter, system-ui, Avenir, Helvetica, Arial, sans-serif',
-  },
-  shape: {
-    borderRadius: 8,
-  },
-});
-
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider theme={theme}>
+      <CustomThemeProvider>
         <CssBaseline />
         <Router>
           <Layout>
@@ -56,7 +33,7 @@ function App() {
             </Routes>
           </Layout>
         </Router>
-      </ThemeProvider>
+      </CustomThemeProvider>
     </QueryClientProvider>
   );
 }

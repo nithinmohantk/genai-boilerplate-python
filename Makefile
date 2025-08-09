@@ -1,4 +1,4 @@
-.PHONY: help install install-dev start-backend start-frontend start-all test test-backend test-frontend lint format clean docker-up docker-down
+.PHONY: help install install-dev start-backend start-frontend start-all test test-backend test-frontend lint format clean docker-up docker-down docker-build-prod docker-push
 
 help: ## Show this help message
 	@echo 'Usage: make [target]'
@@ -63,6 +63,12 @@ docker-down: ## Stop all Docker services
 
 docker-build: ## Build Docker images
 	docker-compose build
+
+docker-build-prod: ## Build production Docker images with thingxcloud tags
+	./scripts/docker-push.sh --build-only
+
+docker-push: ## Build and push Docker images to Docker Hub
+	./scripts/docker-push.sh
 
 docker-logs: ## Show Docker logs
 	docker-compose logs -f

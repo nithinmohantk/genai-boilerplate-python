@@ -18,6 +18,7 @@ import {
   Settings as SettingsIcon,
   Menu as MenuIcon,
 } from '@mui/icons-material';
+import DarkModeToggle from './DarkModeToggle';
 
 interface LayoutProps {
   children: ReactNode;
@@ -60,9 +61,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div">
+          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             GenAI Chatbot
           </Typography>
+          <Box sx={{ ml: 'auto' }}>
+            <DarkModeToggle />
+          </Box>
         </Toolbar>
       </AppBar>
 
