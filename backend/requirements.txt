@@ -3,6 +3,8 @@ fastapi>=0.104.0
 uvicorn[standard]>=0.24.0
 
 # LangChain and AI/ML libraries
+# Add PyTorch first to resolve dependency conflicts
+torch>=2.0.0,<3.0.0
 langchain>=0.1.0
 langchain-openai>=0.1.0
 langchain-anthropic>=0.1.0

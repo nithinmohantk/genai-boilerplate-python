@@ -25,6 +25,8 @@ class WebSocketMessage(BaseModel):
 
 class ConnectionInfo(BaseModel):
     """WebSocket connection information."""
+    
+    model_config = {"arbitrary_types_allowed": True}
 
     connection_id: str
     user_id: str

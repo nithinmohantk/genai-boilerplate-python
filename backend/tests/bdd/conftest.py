@@ -15,9 +15,9 @@ import os
 # Add src to the path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../src"))
 
-from core.database import Base, get_db
+from core.database import Base, get_db_session
 from main import app
-from models import theme  # Import theme models
+from models import *  # Import all models to ensure SQLAlchemy relationships work
 
 
 @pytest.fixture(scope="session")
@@ -49,7 +49,7 @@ def test_database():
         finally:
             db.close()
     
-    app.dependency_overrides[get_db] = override_get_db
+    app.dependency_overrides[get_db_session] = override_get_db
     
     yield TestingSessionLocal
     

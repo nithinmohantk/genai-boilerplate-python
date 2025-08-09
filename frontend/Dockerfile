@@ -4,7 +4,7 @@
 FROM node:20-alpine as builder
 
 # Set build environment variables
-ENV NODE_ENV=production \
+ENV NODE_ENV=development \
     NPM_CONFIG_FUND=false \
     NPM_CONFIG_AUDIT=false
 
@@ -18,18 +18,19 @@ RUN apk add --no-cache \
 # Create app directory
 WORKDIR /app
 
-# Copy package files
+# Copy package files first for better caching
 COPY package*.json ./
 
-# Install all dependencies (including devDependencies for build)
+# Install all dependencies including dev dependencies for build
 RUN npm ci --include=dev --no-optional
 
 # Copy source code
 COPY . .
 
-# Build the application
-RUN npm run build \
-    && npm prune --production
+# Fix Rollup platform dependency issue and build
+RUN rm -rf node_modules/.cache package-lock.json && \
+    npm install && \
+    npm run build
 
 # Production stage
 FROM nginx:1.25-alpine as production

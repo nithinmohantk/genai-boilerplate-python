@@ -156,7 +156,7 @@ class ChatMessage(Base):
     message_type = Column(String(20), nullable=False, default=MessageType.USER)
 
     # Message metadata
-    metadata = Column(JSON, nullable=True)  # Model info, tokens, etc.
+    message_metadata = Column(JSON, nullable=True)  # Model info, tokens, etc.
     tokens_used = Column(Integer, nullable=True)
     processing_time_ms = Column(Integer, nullable=True)
 
@@ -241,7 +241,7 @@ class DocumentChunk(Base):
     embedding = Column(JSON, nullable=True)  # Store as JSON array
 
     # Metadata
-    metadata = Column(JSON, nullable=True)  # Page number, section, etc.
+    chunk_metadata = Column(JSON, nullable=True)  # Page number, section, etc.
     token_count = Column(Integer, nullable=True)
 
     created_at = Column(DateTime, default=datetime.now, nullable=False)
@@ -480,7 +480,7 @@ class ChatSessionBase(BaseModel):
     """Base chat session model."""
 
     title: str | None = Field(None, max_length=200)
-    model_config: dict[str, Any] | None = None
+    llm_model_config: dict[str, Any] | None = None
     system_prompt: str | None = None
     context_window: int | None = Field(4000, ge=1000, le=32000)
 
@@ -496,7 +496,7 @@ class ChatSessionUpdate(BaseModel):
 
     title: str | None = Field(None, max_length=200)
     status: SessionStatus | None = None
-    model_config: dict[str, Any] | None = None
+    llm_model_config: dict[str, Any] | None = None
     system_prompt: str | None = None
 
 
@@ -595,7 +595,7 @@ class ChatCompletionRequest(BaseModel):
     message: str = Field(..., min_length=1, max_length=10000)
     session_id: UUID | None = None  # If None, create new session
     stream: bool = False
-    model_config: dict[str, Any] | None = None
+    llm_model_config: dict[str, Any] | None = None
     include_documents: bool = True  # Whether to include uploaded documents in context
 
 
@@ -605,7 +605,7 @@ class ChatCompletionWithFilesRequest(BaseModel):
     message: str = Field(..., min_length=1, max_length=10000)
     session_id: UUID | None = None  # If None, create new session
     stream: bool = False
-    model_config: dict[str, Any] | None = None
+    llm_model_config: dict[str, Any] | None = None
     include_documents: bool = True
     process_uploaded_files: bool = True  # Auto-process uploaded files for RAG
 
@@ -780,7 +780,7 @@ class FeatureToggleBase(BaseModel):
 class FeatureToggleCreate(FeatureToggleBase):
     """Feature toggle creation model."""
 
-    feature_key: str = Field(..., min_length=1, max_length=100, regex="^[a-z0-9_]+$")
+    feature_key: str = Field(..., min_length=1, max_length=100, pattern="^[a-z0-9_]+$")
     default_status: FeatureStatus = FeatureStatus.DISABLED
     config_schema: dict[str, Any] | None = None
     target_audience: dict[str, Any] | None = None
@@ -868,7 +868,7 @@ class ChatCompletionWithPersonaRequest(BaseModel):
     include_documents: bool = True
     memory_search_limit: int = Field(5, ge=0, le=20)
     stream: bool = False
-    model_config: dict[str, Any] | None = None
+    llm_model_config: dict[str, Any] | None = None
 
 
 class EnhancedChatCompletionResponse(ChatCompletionResponse):

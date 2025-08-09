@@ -85,6 +85,7 @@ class Tenant(Base):
     __table_args__ = (
         Index("idx_tenant_domain", "domain"),
         Index("idx_tenant_status", "status"),
+        {"extend_existing": True}
     )
 
 

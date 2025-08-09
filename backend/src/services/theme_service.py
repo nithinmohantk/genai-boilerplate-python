@@ -150,7 +150,7 @@ class ThemeService:
                 return None
 
             # Update fields
-            update_data = updates.dict(exclude_unset=True)
+            update_data = updates.model_dump(exclude_unset=True)
             for field, value in update_data.items():
                 if hasattr(theme, field):
                     setattr(theme, field, value)
@@ -284,7 +284,7 @@ class ThemeService:
             }
 
             # Update fields
-            update_data = updates.dict(exclude_unset=True)
+            update_data = updates.model_dump(exclude_unset=True)
             for field, value in update_data.items():
                 if hasattr(settings, field):
                     setattr(settings, field, value)
