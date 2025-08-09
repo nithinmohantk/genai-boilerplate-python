@@ -71,9 +71,7 @@ class ThemeService:
     async def get_theme(self, theme_id: UUID) -> Theme | None:
         """Get a theme by ID."""
         try:
-            query = select(Theme).where(
-                and_(Theme.id == theme_id, Theme.is_active)
-            )
+            query = select(Theme).where(and_(Theme.id == theme_id, Theme.is_active))
 
             result = await self.db.execute(query)
             theme = result.scalar_one_or_none()

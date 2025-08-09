@@ -284,7 +284,9 @@ async def broadcast_to_session(session_id: str, message: dict):
 
     except Exception as e:
         logger.error(f"Error broadcasting to session: {e}")
-        raise HTTPException(status_code=500, detail="Failed to broadcast message") from e
+        raise HTTPException(
+            status_code=500, detail="Failed to broadcast message"
+        ) from e
 
 
 @router.delete("/ws/connections/{connection_id}")
@@ -303,4 +305,6 @@ async def disconnect_connection(connection_id: str):
 
     except Exception as e:
         logger.error(f"Error disconnecting connection: {e}")
-        raise HTTPException(status_code=500, detail="Failed to disconnect connection") from e
+        raise HTTPException(
+            status_code=500, detail="Failed to disconnect connection"
+        ) from e
