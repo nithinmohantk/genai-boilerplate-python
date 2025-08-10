@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { createTheme, type Theme } from '@mui/material/styles';
 import { useTheme as useThemeContext } from '../contexts/useTheme';
 
@@ -30,6 +30,7 @@ export const useThemeApplication = () => {
   const [isApplying, setIsApplying] = useState(false);
   const [appliedTheme, setAppliedTheme] = useState<string | null>(null);
   const [previewTheme, setPreviewTheme] = useState<Theme | null>(null);
+  const [currentThemeData, setCurrentThemeData] = useState<BackendTheme | null>(null);
   const themeContext = useThemeContext();
 
   // Fetch theme details from backend
@@ -128,6 +129,42 @@ export const useThemeApplication = () => {
     });
   }, []);
 
+  // Recreate current backend theme when base theme mode changes
+  const recreateCurrentTheme = useCallback(async (newIsDark: boolean) => {
+    const appliedThemeId = localStorage.getItem('applied-theme');
+    const previewThemeId = localStorage.getItem('preview-theme');
+    const currentThemeId = previewThemeId || appliedThemeId;
+    
+    if (currentThemeId && currentThemeData) {
+      try {
+        const muiTheme = createMUITheme(currentThemeData, newIsDark);
+        setPreviewTheme(muiTheme);
+        
+        // Dispatch event to update the main theme provider
+        window.dispatchEvent(new CustomEvent('backend-theme-change', {
+          detail: { theme: muiTheme, themeId: currentThemeId }
+        }));
+        
+        console.log(`Recreated ${currentThemeData.display_name} for ${newIsDark ? 'dark' : 'light'} mode`);
+      } catch (error) {
+        console.error('Failed to recreate theme for new mode:', error);
+      }
+    }
+  }, [currentThemeData, createMUITheme]);
+
+  // Listen for base theme mode changes
+  useEffect(() => {
+    const handleBaseModeChange = (event: CustomEvent) => {
+      recreateCurrentTheme(event.detail.isDark);
+    };
+
+    window.addEventListener('base-theme-mode-change', handleBaseModeChange as EventListener);
+    
+    return () => {
+      window.removeEventListener('base-theme-mode-change', handleBaseModeChange as EventListener);
+    };
+  }, [recreateCurrentTheme]);
+
   // Preview a theme temporarily
   const previewThemeById = useCallback(async (themeId: string) => {
     try {
@@ -135,6 +172,7 @@ export const useThemeApplication = () => {
       const themeData = await fetchThemeDetails(themeId);
       const muiTheme = createMUITheme(themeData, themeContext.isDark);
       setPreviewTheme(muiTheme);
+      setCurrentThemeData(themeData); // Store theme data for mode switching
       
       // Don't set as applied theme - this is just a preview
       // setAppliedTheme(themeId);
@@ -163,6 +201,7 @@ export const useThemeApplication = () => {
       const themeData = await fetchThemeDetails(themeId);
       const muiTheme = createMUITheme(themeData, themeContext.isDark);
       setPreviewTheme(muiTheme);
+      setCurrentThemeData(themeData); // Store theme data for mode switching
       setAppliedTheme(themeId);
       
       // Store the applied theme in localStorage
@@ -185,8 +224,10 @@ export const useThemeApplication = () => {
   // Clear preview and revert to default
   const clearPreview = useCallback(() => {
     setPreviewTheme(null);
+    setCurrentThemeData(null);
     setAppliedTheme(null);
     localStorage.removeItem('preview-theme');
+    localStorage.removeItem('applied-theme');
     
     // Dispatch custom event to clear the theme
     window.dispatchEvent(new CustomEvent('backend-theme-clear'));
@@ -205,7 +246,13 @@ export const useThemeApplication = () => {
         const themeData = await fetchThemeDetails(themeToLoad);
         const muiTheme = createMUITheme(themeData, themeContext.isDark);
         setPreviewTheme(muiTheme);
+        setCurrentThemeData(themeData); // Store theme data for mode switching
         setAppliedTheme(themeToLoad);
+        
+        // Dispatch event to update the main theme provider
+        window.dispatchEvent(new CustomEvent('backend-theme-change', {
+          detail: { theme: muiTheme, themeId: themeToLoad }
+        }));
       } catch (error) {
         console.error('Failed to load saved theme:', error);
         // Clear invalid theme from storage
