@@ -12,18 +12,47 @@ import { globalThemeManager } from './utils/globalThemeManager';
 import { CustomThemeProvider } from './contexts/ThemeContext';
 import { ThemeApplicationProvider } from './contexts/ThemeApplicationContext';
 
-// Routes component that forces re-render on location change
+// Enhanced Routes component with forced re-rendering and component isolation
 function AppRoutes() {
   const location = useLocation();
-  console.log('🔄 AppRoutes: Location changed, re-rendering routes for:', location.pathname);
+  const [routeKey, setRouteKey] = React.useState(0);
+  
+  // Force re-render whenever location changes
+  React.useEffect(() => {
+    console.log('🔄 AppRoutes: Location changed, forcing re-render for:', location.pathname);
+    setRouteKey(prev => prev + 1);
+    
+    // Force a micro-task to ensure React has time to process the change
+    setTimeout(() => {
+      console.log('🔄 AppRoutes: Route key updated to:', routeKey + 1);
+    }, 0);
+  }, [location.pathname]);
+  
+  // Create unique keys for each component based on path and timestamp
+  const getComponentKey = (baseName: string) => `${baseName}-${location.pathname}-${routeKey}`;
   
   return (
-    <Routes key={location.pathname}>
-      <Route path="/" element={<ChatPage key="chat-home" />} />
-      <Route path="/chat" element={<ChatPage key="chat" />} />
-      <Route path="/documents" element={<DocumentsPage key="documents" />} />
-      <Route path="/settings" element={<SettingsPage key="settings" />} />
-      <Route path="/admin" element={<AdminPage key="admin" />} />
+    <Routes key={`routes-${location.pathname}-${routeKey}`}>
+      <Route 
+        path="/" 
+        element={<ChatPage key={getComponentKey('chat-home')} />} 
+      />
+      <Route 
+        path="/chat" 
+        element={<ChatPage key={getComponentKey('chat')} />} 
+      />
+      <Route 
+        path="/documents" 
+        element={<DocumentsPage key={getComponentKey('documents')} />} 
+      />
+      <Route 
+        path="/settings" 
+        element={<SettingsPage key={getComponentKey('settings')} />} 
+      />
+      <Route 
+        path="/admin" 
+        element={<AdminPage key={getComponentKey('admin')} />} 
+      />
     </Routes>
   );
 }

@@ -51,7 +51,19 @@ interface Settings {
 }
 
 const SettingsPage: React.FC = () => {
-  console.log('⚙️ SettingsPage: Component rendering/re-rendering');
+  const mountId = React.useRef(`settings-${Date.now()}-${Math.random()}`);
+  const renderCount = React.useRef(0);
+  
+  React.useEffect(() => {
+    console.log('⚙️ SettingsPage: Component MOUNTED with ID:', mountId.current);
+    return () => {
+      console.log('⚙️ SettingsPage: Component UNMOUNTED with ID:', mountId.current);
+    };
+  }, []);
+  
+  renderCount.current += 1;
+  console.log('⚙️ SettingsPage: Render #', renderCount.current, 'ID:', mountId.current);
+  
   const { mode: currentTheme, setTheme, isDark } = useTheme();
   
   

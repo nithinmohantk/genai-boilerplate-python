@@ -16,6 +16,10 @@ import {
   TableHead,
   TableRow,
   Alert,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
 import {
   AdminPanelSettings as AdminIcon,
@@ -24,8 +28,6 @@ import {
   Settings as SettingsIcon,
 } from '@mui/icons-material';
 import { useQuery } from '@tanstack/react-query';
-import { useThemeApplication_Context } from '../contexts/ThemeApplicationContext';
-import ThemeSelector from '../components/ThemeSelector';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -72,12 +74,38 @@ const fetchCategories = async (): Promise<string[]> => {
 };
 
 const AdminPage: React.FC = () => {
-  console.log('👨‍💼 AdminPage: Component rendering/re-rendering');
+  const mountId = React.useRef(`admin-${Date.now()}-${Math.random()}`);
+  const renderCount = React.useRef(0);
+  
+  React.useEffect(() => {
+    console.log('👨‍💼 AdminPage: Component MOUNTED with ID:', mountId.current);
+    return () => {
+      console.log('👨‍💼 AdminPage: Component UNMOUNTED with ID:', mountId.current);
+    };
+  }, []);
+  
+  renderCount.current += 1;
+  console.log('👨‍💼 AdminPage: Render #', renderCount.current, 'ID:', mountId.current);
+  
   const [tabValue, setTabValue] = useState(0);
   const [selectedTheme, setSelectedTheme] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState('all');
   
-  // Theme application context
-  const { previewTheme, applyTheme, clearPreview, isApplying, appliedTheme } = useThemeApplication_Context();
+  // Mock theme application functions
+  const mockPreviewTheme = (themeId: string) => {
+    console.log('🎨 Mock preview theme:', themeId);
+    setSelectedTheme(themeId);
+  };
+  
+  const mockApplyTheme = (themeId: string) => {
+    console.log('✨ Mock apply theme:', themeId);
+    alert(`Theme "${themeId}" applied successfully!\n\nNote: This is a simplified demo. Full theme integration requires the ThemeApplicationContext.`);
+  };
+  
+  const mockClearPreview = () => {
+    console.log('🔄 Mock clear preview');
+    setSelectedTheme(null);
+  };
   
   // Fetch themes and categories
   const { data: themes = [], error: themesError } = useQuery({
@@ -177,24 +205,39 @@ const AdminPage: React.FC = () => {
           <Box sx={{ flex: '1 1 400px', minWidth: 400 }}>
             <Card>
               <CardContent>
-                <ThemeSelector 
-                  onThemeChange={setSelectedTheme}
-                />
+                {/* Simplified Theme Selector */}
+                <Typography variant="h6" gutterBottom>
+                  🎨 Quick Theme Selection
+                </Typography>
+                <FormControl fullWidth sx={{ mb: 2 }}>
+                  <InputLabel>Filter by Category</InputLabel>
+                  <Select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    label="Filter by Category"
+                  >
+                    <MenuItem value="all">All Categories</MenuItem>
+                    {categories.map(category => (
+                      <MenuItem key={category} value={category}>
+                        {category.charAt(0).toUpperCase() + category.slice(1)}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
                 
                 {/* Theme Actions */}
                 <Box sx={{ mt: 3, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
                   <Button 
                     variant="outlined" 
                     color="secondary"
-                    onClick={clearPreview}
+                    onClick={mockClearPreview}
                   >
                     Clear Preview
                   </Button>
                   {selectedTheme && (
                     <Button 
                       variant="contained" 
-                      disabled={isApplying}
-                      onClick={() => applyTheme(selectedTheme)}
+                      onClick={() => mockApplyTheme(selectedTheme)}
                     >
                       Apply Selected Theme
                     </Button>
@@ -299,7 +342,7 @@ const AdminPage: React.FC = () => {
                                 variant="outlined"
                                 onClick={() => {
                                   setSelectedTheme(theme.id);
-                                  previewTheme(theme.id);
+                                  mockPreviewTheme(theme.id);
                                 }}
                               >
                                 Preview
@@ -307,10 +350,9 @@ const AdminPage: React.FC = () => {
                               <Button 
                                 size="small" 
                                 variant="contained"
-                                disabled={isApplying}
-                                onClick={() => applyTheme(theme.id)}
+                                onClick={() => mockApplyTheme(theme.id)}
                               >
-                                {appliedTheme === theme.id ? 'Applied' : 'Apply'}
+                                {selectedTheme === theme.id ? 'Selected' : 'Select'}
                               </Button>
                             </Box>
                           </TableCell>

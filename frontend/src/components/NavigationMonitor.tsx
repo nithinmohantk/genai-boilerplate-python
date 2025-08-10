@@ -1,27 +1,46 @@
-import React, { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useEffect, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface NavigationMonitorProps {
   children: React.ReactNode;
 }
 
 /**
- * NavigationMonitor component that watches for route changes and forces
- * re-renders when navigation occurs. This helps fix navigation issues
- * caused by complex provider nesting.
+ * Enhanced NavigationMonitor component that forcefully handles route changes
+ * and ensures content remounting. This fixes navigation issues by manually
+ * triggering re-renders and DOM reflows.
  */
 const NavigationMonitor: React.FC<NavigationMonitorProps> = ({ children }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [forceUpdate, setForceUpdate] = React.useState(0);
-
+  const previousPathRef = useRef<string>(location.pathname);
+  const contentRef = useRef<HTMLDivElement>(null);
+  
+  // Enhanced navigation monitoring with additional safeguards
   useEffect(() => {
-    console.log('🎯 NavigationMonitor: Route changed to:', location.pathname);
-    console.log('🎯 NavigationMonitor: Full location object:', location);
+    // Only proceed if the path has actually changed
+    if (previousPathRef.current === location.pathname) {
+      return;
+    }
+    
+    console.log('🎯 NavigationMonitor: Route changed from', previousPathRef.current, 'to:', location.pathname);
+    previousPathRef.current = location.pathname;
     
     // Force a re-render by updating state
     setForceUpdate(prev => prev + 1);
     
-    // Dispatch a custom event for any components that might need it
+    // Trigger a browser reflow by directly manipulating the DOM
+    if (contentRef.current) {
+      // Force a reflow by reading and writing to the DOM
+      void contentRef.current.offsetHeight;
+      contentRef.current.style.display = 'none';
+      // Force a reflow
+      void contentRef.current.offsetHeight;
+      contentRef.current.style.display = '';
+    }
+    
+    // Dispatch a custom event for any components that need to react to navigation
     window.dispatchEvent(new CustomEvent('navigation-change', {
       detail: { 
         pathname: location.pathname,
@@ -31,11 +50,28 @@ const NavigationMonitor: React.FC<NavigationMonitorProps> = ({ children }) => {
       }
     }));
     
-  }, [location]);
+    // Set up a backup timer to force re-navigate if content doesn't update
+    const timer = setTimeout(() => {
+      // If we still see issues, force a hard reload of the route
+      const currentPath = window.location.pathname;
+      if (currentPath === location.pathname) {
+        console.log('🔄 NavigationMonitor: Forcing route refresh for:', location.pathname);
+        // Re-navigate to the same route to force a full refresh
+        navigate(location.pathname, { replace: true, state: { forceRefresh: Date.now() } });
+      }
+    }, 100); // Short timeout to avoid unnecessary refreshes
+    
+    return () => clearTimeout(timer);
+  }, [location, navigate]);
 
-  // Use the location pathname as a key to force remounting of children
+  // Use a combination of key-based remounting and ref-based DOM manipulation
   return (
-    <div key={`${location.pathname}-${forceUpdate}`}>
+    <div 
+      ref={contentRef}
+      key={`route-${location.pathname}-${forceUpdate}`}
+      data-current-route={location.pathname}
+      data-route-timestamp={Date.now()}
+    >
       {children}
     </div>
   );
