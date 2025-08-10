@@ -638,4 +638,359 @@ class ThemeInitService:
                     "comfortable_contrast": True,
                 },
             },
+            # 13. Glossy White - Material Design with glossy white aesthetics
+            {
+                "name": "glossy_white",
+                "display_name": "Glossy White",
+                "description": "Material Design with pristine glossy white aesthetics and subtle shadows",
+                "category": ThemeCategory.MODERN,
+                "color_scheme": {
+                    "light": {
+                        "primary": "#1976d2",  # Material Blue 700
+                        "secondary": "#2196f3",  # Material Blue 500
+                        "accent": "#42a5f5",  # Material Blue 400
+                        "background": "#fafafa",  # Material Grey 50
+                        "surface": "#ffffff",  # Pure White
+                        "surface_variant": "#f5f5f5",  # Material Grey 100
+                        "text": "#212121",  # Material Grey 900
+                        "text_secondary": "#757575",  # Material Grey 600
+                        "text_muted": "#9e9e9e",  # Material Grey 500
+                        "border": "#e0e0e0",  # Material Grey 300
+                        "success": "#4caf50",  # Material Green 500
+                        "warning": "#ff9800",  # Material Orange 500
+                        "error": "#f44336",  # Material Red 500
+                        "info": "#2196f3",  # Material Blue 500
+                        "elevation_1": "rgba(0, 0, 0, 0.05)",
+                        "elevation_2": "rgba(0, 0, 0, 0.1)",
+                        "elevation_3": "rgba(0, 0, 0, 0.15)",
+                    },
+                    "dark": {
+                        "primary": "#90caf9",  # Material Blue 200
+                        "secondary": "#64b5f6",  # Material Blue 300
+                        "accent": "#42a5f5",  # Material Blue 400
+                        "background": "#121212",  # Material Dark Background
+                        "surface": "#1e1e1e",  # Material Dark Surface
+                        "surface_variant": "#2c2c2c",  # Material Dark Surface Variant
+                        "text": "#ffffff",  # White
+                        "text_secondary": "#b3b3b3",  # Light Grey
+                        "text_muted": "#808080",  # Medium Grey
+                        "border": "#404040",  # Dark Grey
+                        "success": "#81c784",  # Material Green 300
+                        "warning": "#ffb74d",  # Material Orange 300
+                        "error": "#e57373",  # Material Red 300
+                        "info": "#64b5f6",  # Material Blue 300
+                        "elevation_1": "rgba(255, 255, 255, 0.05)",
+                        "elevation_2": "rgba(255, 255, 255, 0.08)",
+                        "elevation_3": "rgba(255, 255, 255, 0.12)",
+                    },
+                },
+                "supports_dark_mode": True,
+                "accessibility_features": {
+                    "material_design": True,
+                    "glossy_effects": True,
+                    "clean_aesthetics": True,
+                },
+                "css_variables": {
+                    "border-radius": "8px",
+                    "shadow": "0 2px 8px rgba(0, 0, 0, 0.1)",
+                    "shadow-lg": "0 8px 24px rgba(0, 0, 0, 0.15)",
+                    "glossy-overlay": "linear-gradient(145deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 100%)",
+                },
+            },
+            # 14. Glossy Black - Material Design with sophisticated black glossy finish
+            {
+                "name": "glossy_black",
+                "display_name": "Glossy Black",
+                "description": "Material Design with sophisticated black glossy finish and chrome accents",
+                "category": ThemeCategory.MODERN,
+                "color_scheme": {
+                    "light": {
+                        "primary": "#424242",  # Material Grey 800
+                        "secondary": "#616161",  # Material Grey 700
+                        "accent": "#757575",  # Material Grey 600
+                        "background": "#fafafa",  # Material Grey 50
+                        "surface": "#ffffff",  # White
+                        "surface_variant": "#f5f5f5",  # Material Grey 100
+                        "text": "#212121",  # Material Grey 900
+                        "text_secondary": "#424242",  # Material Grey 800
+                        "text_muted": "#757575",  # Material Grey 600
+                        "border": "#bdbdbd",  # Material Grey 400
+                        "success": "#4caf50",  # Material Green 500
+                        "warning": "#ff9800",  # Material Orange 500
+                        "error": "#f44336",  # Material Red 500
+                        "info": "#607d8b",  # Material Blue Grey 500
+                        "chrome_accent": "#9e9e9e",  # Material Grey 500
+                    },
+                    "dark": {
+                        "primary": "#ffffff",  # White
+                        "secondary": "#e0e0e0",  # Material Grey 300
+                        "accent": "#bdbdbd",  # Material Grey 400
+                        "background": "#000000",  # Pure Black
+                        "surface": "#121212",  # Material Dark Surface
+                        "surface_variant": "#1e1e1e",  # Darker Surface
+                        "text": "#ffffff",  # White
+                        "text_secondary": "#e0e0e0",  # Material Grey 300
+                        "text_muted": "#bdbdbd",  # Material Grey 400
+                        "border": "#424242",  # Material Grey 800
+                        "success": "#66bb6a",  # Material Green 400
+                        "warning": "#ffa726",  # Material Orange 400
+                        "error": "#ef5350",  # Material Red 400
+                        "info": "#78909c",  # Material Blue Grey 400
+                        "chrome_accent": "#757575",  # Material Grey 600
+                    },
+                },
+                "supports_dark_mode": True,
+                "accessibility_features": {
+                    "material_design": True,
+                    "glossy_effects": True,
+                    "premium_finish": True,
+                },
+                "css_variables": {
+                    "border-radius": "6px",
+                    "shadow": "0 4px 12px rgba(0, 0, 0, 0.3)",
+                    "shadow-lg": "0 12px 32px rgba(0, 0, 0, 0.4)",
+                    "glossy-overlay": "linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.1) 100%)",
+                },
+            },
+            # 15. Glossy Glass - Material Design with translucent glass morphism
+            {
+                "name": "glossy_glass",
+                "display_name": "Glossy Glass",
+                "description": "Material Design with translucent glass morphism and frosted effects",
+                "category": ThemeCategory.MODERN,
+                "color_scheme": {
+                    "light": {
+                        "primary": "#1976d2",  # Material Blue 700
+                        "secondary": "#2196f3",  # Material Blue 500
+                        "accent": "#03dac6",  # Material Teal A400
+                        "background": "rgba(248, 250, 252, 0.8)",  # Semi-transparent light
+                        "surface": "rgba(255, 255, 255, 0.7)",  # Glass white
+                        "surface_variant": "rgba(245, 245, 245, 0.6)",  # Glass variant
+                        "text": "#1a1a1a",  # Near black
+                        "text_secondary": "#4a4a4a",  # Medium dark
+                        "text_muted": "#757575",  # Material Grey 600
+                        "border": "rgba(224, 224, 224, 0.5)",  # Semi-transparent border
+                        "success": "#4caf50",  # Material Green 500
+                        "warning": "#ff9800",  # Material Orange 500
+                        "error": "#f44336",  # Material Red 500
+                        "info": "#2196f3",  # Material Blue 500
+                        "glass_overlay": "rgba(255, 255, 255, 0.25)",
+                        "backdrop_filter": "blur(20px)",
+                    },
+                    "dark": {
+                        "primary": "#bb86fc",  # Material Purple 200
+                        "secondary": "#03dac6",  # Material Teal A400
+                        "accent": "#cf6679",  # Material Pink A100
+                        "background": "rgba(18, 18, 18, 0.8)",  # Semi-transparent dark
+                        "surface": "rgba(30, 30, 30, 0.7)",  # Glass dark
+                        "surface_variant": "rgba(44, 44, 44, 0.6)",  # Glass dark variant
+                        "text": "#ffffff",  # White
+                        "text_secondary": "#e0e0e0",  # Light grey
+                        "text_muted": "#9e9e9e",  # Material Grey 500
+                        "border": "rgba(66, 66, 66, 0.5)",  # Semi-transparent dark border
+                        "success": "#81c784",  # Material Green 300
+                        "warning": "#ffb74d",  # Material Orange 300
+                        "error": "#e57373",  # Material Red 300
+                        "info": "#64b5f6",  # Material Blue 300
+                        "glass_overlay": "rgba(255, 255, 255, 0.1)",
+                        "backdrop_filter": "blur(20px)",
+                    },
+                },
+                "supports_dark_mode": True,
+                "accessibility_features": {
+                    "material_design": True,
+                    "glass_morphism": True,
+                    "backdrop_filter": True,
+                    "translucent_effects": True,
+                },
+                "css_variables": {
+                    "border-radius": "12px",
+                    "shadow": "0 8px 32px rgba(0, 0, 0, 0.12)",
+                    "shadow-lg": "0 16px 48px rgba(0, 0, 0, 0.18)",
+                    "backdrop-filter": "blur(20px) saturate(180%)",
+                    "glass-border": "1px solid rgba(255, 255, 255, 0.2)",
+                },
+            },
+            # 16. Glossy Black White - High contrast Material Design with glossy accents
+            {
+                "name": "glossy_black_white",
+                "display_name": "Glossy Black White",
+                "description": "High contrast Material Design combining glossy black and white elements",
+                "category": ThemeCategory.MODERN,
+                "color_scheme": {
+                    "light": {
+                        "primary": "#000000",  # Pure Black
+                        "secondary": "#212121",  # Material Grey 900
+                        "accent": "#1976d2",  # Material Blue 700
+                        "background": "#ffffff",  # Pure White
+                        "surface": "#fafafa",  # Material Grey 50
+                        "surface_variant": "#f5f5f5",  # Material Grey 100
+                        "text": "#000000",  # Pure Black
+                        "text_secondary": "#424242",  # Material Grey 800
+                        "text_muted": "#757575",  # Material Grey 600
+                        "border": "#000000",  # Pure Black
+                        "success": "#388e3c",  # Material Green 700
+                        "warning": "#f57c00",  # Material Orange 700
+                        "error": "#d32f2f",  # Material Red 700
+                        "info": "#1976d2",  # Material Blue 700
+                        "contrast_surface": "#000000",  # Black accent surface
+                        "contrast_text": "#ffffff",  # White text on black
+                    },
+                    "dark": {
+                        "primary": "#ffffff",  # Pure White
+                        "secondary": "#f5f5f5",  # Material Grey 100
+                        "accent": "#64b5f6",  # Material Blue 300
+                        "background": "#000000",  # Pure Black
+                        "surface": "#121212",  # Material Dark Surface
+                        "surface_variant": "#1e1e1e",  # Dark Surface Variant
+                        "text": "#ffffff",  # Pure White
+                        "text_secondary": "#e0e0e0",  # Material Grey 300
+                        "text_muted": "#bdbdbd",  # Material Grey 400
+                        "border": "#ffffff",  # Pure White
+                        "success": "#66bb6a",  # Material Green 400
+                        "warning": "#ffa726",  # Material Orange 400
+                        "error": "#ef5350",  # Material Red 400
+                        "info": "#64b5f6",  # Material Blue 300
+                        "contrast_surface": "#ffffff",  # White accent surface
+                        "contrast_text": "#000000",  # Black text on white
+                    },
+                },
+                "supports_dark_mode": True,
+                "accessibility_features": {
+                    "material_design": True,
+                    "ultra_high_contrast": True,
+                    "glossy_effects": True,
+                    "wcag_aaa_compliant": True,
+                },
+                "css_variables": {
+                    "border-radius": "4px",
+                    "shadow": "0 2px 8px rgba(0, 0, 0, 0.26)",
+                    "shadow-lg": "0 8px 24px rgba(0, 0, 0, 0.38)",
+                    "contrast-shadow": "0 4px 12px rgba(255, 255, 255, 0.3)",
+                },
+            },
+            # 17. Glossy Green - Material Design with vibrant green glossy aesthetics
+            {
+                "name": "glossy_green",
+                "display_name": "Glossy Green",
+                "description": "Material Design with vibrant green glossy aesthetics and natural tones",
+                "category": ThemeCategory.MODERN,
+                "color_scheme": {
+                    "light": {
+                        "primary": "#2e7d32",  # Material Green 800
+                        "secondary": "#388e3c",  # Material Green 700
+                        "accent": "#4caf50",  # Material Green 500
+                        "background": "#f1f8e9",  # Material Light Green 50
+                        "surface": "#ffffff",  # White
+                        "surface_variant": "#e8f5e8",  # Light Green 100
+                        "text": "#1b5e20",  # Material Green 900
+                        "text_secondary": "#2e7d32",  # Material Green 800
+                        "text_muted": "#4caf50",  # Material Green 500
+                        "border": "#a5d6a7",  # Material Green 200
+                        "success": "#388e3c",  # Material Green 700
+                        "warning": "#f57c00",  # Material Orange 700
+                        "error": "#d32f2f",  # Material Red 700
+                        "info": "#0277bd",  # Material Light Blue 800
+                        "nature_accent_1": "#66bb6a",  # Material Green 400
+                        "nature_accent_2": "#81c784",  # Material Green 300
+                    },
+                    "dark": {
+                        "primary": "#66bb6a",  # Material Green 400
+                        "secondary": "#4caf50",  # Material Green 500
+                        "accent": "#81c784",  # Material Green 300
+                        "background": "#0d1b0d",  # Dark Green Background
+                        "surface": "#1a2c1a",  # Dark Green Surface
+                        "surface_variant": "#2e4a2e",  # Dark Green Variant
+                        "text": "#c8e6c9",  # Material Green 100
+                        "text_secondary": "#a5d6a7",  # Material Green 200
+                        "text_muted": "#66bb6a",  # Material Green 400
+                        "border": "#2e7d32",  # Material Green 800
+                        "success": "#4caf50",  # Material Green 500
+                        "warning": "#ffa726",  # Material Orange 400
+                        "error": "#ef5350",  # Material Red 400
+                        "info": "#29b6f6",  # Material Light Blue 400
+                        "nature_accent_1": "#4caf50",  # Material Green 500
+                        "nature_accent_2": "#81c784",  # Material Green 300
+                    },
+                },
+                "supports_dark_mode": True,
+                "accessibility_features": {
+                    "material_design": True,
+                    "nature_inspired": True,
+                    "glossy_effects": True,
+                    "eco_friendly_theme": True,
+                },
+                "css_variables": {
+                    "border-radius": "8px",
+                    "shadow": "0 2px 12px rgba(76, 175, 80, 0.15)",
+                    "shadow-lg": "0 8px 28px rgba(76, 175, 80, 0.25)",
+                    "nature-gradient": "linear-gradient(135deg, #4caf50 0%, #81c784 100%)",
+                },
+            },
+            # 18. Green Theme - Comprehensive green ecosystem theme
+            {
+                "name": "green_theme",
+                "display_name": "Green Theme",
+                "description": "Comprehensive green ecosystem theme with multiple green shades and natural harmony",
+                "category": ThemeCategory.CREATIVE,
+                "color_scheme": {
+                    "light": {
+                        "primary": "#1b5e20",  # Material Green 900
+                        "secondary": "#2e7d32",  # Material Green 800
+                        "accent": "#00c853",  # Material Green A400
+                        "background": "#e8f5e8",  # Custom Light Green
+                        "surface": "#f1f8e9",  # Material Light Green 50
+                        "surface_variant": "#dcedc8",  # Material Light Green 100
+                        "text": "#1b5e20",  # Material Green 900
+                        "text_secondary": "#2e7d32",  # Material Green 800
+                        "text_muted": "#558b2f",  # Material Light Green 800
+                        "border": "#8bc34a",  # Material Light Green 500
+                        "success": "#4caf50",  # Material Green 500
+                        "warning": "#ff8f00",  # Material Amber 800
+                        "error": "#c62828",  # Material Red 800
+                        "info": "#00695c",  # Material Teal 800
+                        "forest_green": "#2e7d32",  # Forest Green
+                        "lime_green": "#689f38",  # Lime Green
+                        "mint_green": "#00695c",  # Mint Green (Teal)
+                        "sage_green": "#8bc34a",  # Sage Green (Light Green)
+                        "emerald_green": "#00c853",  # Emerald Green
+                    },
+                    "dark": {
+                        "primary": "#4caf50",  # Material Green 500
+                        "secondary": "#66bb6a",  # Material Green 400
+                        "accent": "#69f0ae",  # Material Green A200
+                        "background": "#0a1a0a",  # Deep Dark Green
+                        "surface": "#1a2c1a",  # Dark Green Surface
+                        "surface_variant": "#2d4a2d",  # Darker Green Variant
+                        "text": "#c8e6c9",  # Material Green 100
+                        "text_secondary": "#a5d6a7",  # Material Green 200
+                        "text_muted": "#81c784",  # Material Green 300
+                        "border": "#388e3c",  # Material Green 700
+                        "success": "#4caf50",  # Material Green 500
+                        "warning": "#ffb300",  # Material Amber 600
+                        "error": "#e53935",  # Material Red 600
+                        "info": "#26a69a",  # Material Teal 400
+                        "forest_green": "#388e3c",  # Forest Green (darker)
+                        "lime_green": "#9ccc65",  # Lime Green (lighter)
+                        "mint_green": "#4db6ac",  # Mint Green (Teal 300)
+                        "sage_green": "#aed581",  # Sage Green (Light Green 300)
+                        "emerald_green": "#00e676",  # Emerald Green (Green A400)
+                    },
+                },
+                "supports_dark_mode": True,
+                "accessibility_features": {
+                    "nature_harmony": True,
+                    "multiple_green_shades": True,
+                    "eco_consciousness": True,
+                    "calming_environment": True,
+                },
+                "css_variables": {
+                    "border-radius": "10px",
+                    "shadow": "0 2px 16px rgba(76, 175, 80, 0.2)",
+                    "shadow-lg": "0 8px 32px rgba(76, 175, 80, 0.3)",
+                    "nature-gradient-1": "linear-gradient(45deg, #4caf50 0%, #81c784 50%, #c8e6c9 100%)",
+                    "nature-gradient-2": "linear-gradient(135deg, #2e7d32 0%, #4caf50 50%, #66bb6a 100%)",
+                    "forest-overlay": "radial-gradient(circle, rgba(76,175,80,0.1) 0%, rgba(46,125,50,0.05) 100%)",
+                },
+            },
         ]

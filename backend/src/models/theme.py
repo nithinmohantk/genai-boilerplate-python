@@ -34,6 +34,7 @@ class ThemeCategory(str, Enum):
     CREATIVE = "creative"
     INDUSTRY = "industry"
     ACCESSIBILITY = "accessibility"
+    MODERN = "modern"
     SYSTEM = "system"
 
 
