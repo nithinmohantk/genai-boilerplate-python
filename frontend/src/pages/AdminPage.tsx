@@ -24,8 +24,8 @@ import {
   Settings as SettingsIcon,
 } from '@mui/icons-material';
 import { useQuery } from '@tanstack/react-query';
-import ThemeSelector from '../components/ThemeSelector';
 import { useThemeApplication_Context } from '../contexts/ThemeApplicationContext';
+import ThemeSelector from '../components/ThemeSelector';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -73,26 +73,22 @@ const fetchCategories = async (): Promise<string[]> => {
 
 const AdminPage: React.FC = () => {
   const [tabValue, setTabValue] = useState(0);
-  const [selectedTheme, setSelectedTheme] = useState<string>('');
+  const [selectedTheme, setSelectedTheme] = useState<string | null>(null);
   
-  // Use theme application context
-  const { 
-    previewTheme, 
-    applyTheme, 
-    clearPreview, 
-    isApplying, 
-    appliedTheme 
-  } = useThemeApplication_Context();
-
-  // Fetch data
+  // Theme application context
+  const { previewTheme, applyTheme, clearPreview, isApplying, appliedTheme } = useThemeApplication_Context();
+  
+  // Fetch themes and categories
   const { data: themes = [], error: themesError } = useQuery({
-    queryKey: ['admin-themes'],
+    queryKey: ['themes'],
     queryFn: fetchThemes,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
-
+  
   const { data: categories = [] } = useQuery({
-    queryKey: ['admin-categories'],
+    queryKey: ['theme-categories'],
     queryFn: fetchCategories,
+    staleTime: 10 * 60 * 1000, // 10 minutes
   });
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
@@ -276,7 +272,6 @@ const AdminPage: React.FC = () => {
                       {themes.map((theme) => (
                         <TableRow 
                           key={theme.id}
-                          selected={selectedTheme === theme.id}
                           hover
                         >
                           <TableCell>

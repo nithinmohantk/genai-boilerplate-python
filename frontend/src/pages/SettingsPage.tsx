@@ -24,9 +24,8 @@ import {
   DarkMode as DarkModeIcon,
   SettingsBrightness as AutoModeIcon,
 } from '@mui/icons-material';
-import { useTheme as useCustomTheme } from '../contexts/useTheme';
+import { useTheme } from '../contexts/useTheme';
 import DarkModeToggle from '../components/DarkModeToggle';
-import ThemeSelector from '../components/ThemeSelector';
 
 interface Settings {
   // AI Model Settings
@@ -52,7 +51,8 @@ interface Settings {
 }
 
 const SettingsPage: React.FC = () => {
-  const { mode: currentTheme, setTheme, isDark } = useCustomTheme();
+  const { mode: currentTheme, setTheme, isDark } = useTheme();
+  
   
   const [settings, setSettings] = useState<Settings>({
     aiProvider: 'openai',
@@ -379,10 +379,6 @@ const SettingsPage: React.FC = () => {
                 🌙 Theme & Interface
               </Typography>
               
-              {/* Professional Theme Selector */}
-              <Box sx={{ mb: 3 }}>
-                <ThemeSelector onThemeChange={(themeId) => console.log('Selected theme:', themeId)} />
-              </Box>
               
               {/* Theme Mode Selection */}
               <Box sx={{ mb: 3 }}>
