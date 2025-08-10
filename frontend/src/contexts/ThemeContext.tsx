@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
-import { ThemeProvider } from '@mui/material/styles';
+import { ThemeProvider, type Theme } from '@mui/material/styles';
 import {
   type ThemeMode,
   getThemeConfig,
@@ -34,12 +34,45 @@ export const CustomThemeProvider: React.FC<ThemeContextProviderProps> = ({ child
     return 'auto';
   });
 
+  // State for backend themes
+  const [backendTheme, setBackendTheme] = useState<Theme | null>(null);
+
   // Get effective mode for theme creation
   const effectiveMode = getEffectiveMode(mode);
   const isDark = effectiveMode === 'dark';
 
-  // Create theme based on effective mode
-  const theme = getThemeConfig(effectiveMode);
+  // Create theme based on effective mode or use backend theme
+  const theme = backendTheme || getThemeConfig(effectiveMode);
+
+  // Listen for backend theme changes via custom events
+  useEffect(() => {
+    const handleBackendThemeChange = (event: CustomEvent) => {
+      setBackendTheme(event.detail.theme);
+    };
+
+    const handleBackendThemeClear = () => {
+      setBackendTheme(null);
+    };
+
+    window.addEventListener('backend-theme-change', handleBackendThemeChange as EventListener);
+    window.addEventListener('backend-theme-clear', handleBackendThemeClear);
+
+    return () => {
+      window.removeEventListener('backend-theme-change', handleBackendThemeChange as EventListener);
+      window.removeEventListener('backend-theme-clear', handleBackendThemeClear);
+    };
+  }, []);
+
+  // Update backend theme when base theme mode changes (for applied backend themes)
+  useEffect(() => {
+    // If there's a backend theme active, we need to recreate it with the new mode
+    if (backendTheme) {
+      // Dispatch an event to trigger backend theme recreation with new mode
+      window.dispatchEvent(new CustomEvent('base-theme-mode-change', {
+        detail: { isDark: isDark }
+      }));
+    }
+  }, [isDark, backendTheme]);
 
   // Save mode to localStorage whenever it changes
   useEffect(() => {

@@ -5,7 +5,7 @@ Startup initialization for themes and database setup.
 import asyncio
 import logging
 
-from database.connection import get_db_session
+from core.database import get_async_session
 from services.theme_init_service import ThemeInitService
 from services.theme_service import ThemeService
 
@@ -18,7 +18,7 @@ async def initialize_themes():
         logger.info("Starting theme initialization...")
 
         # Get database session
-        async with get_db_session() as session:
+        async with get_async_session() as session:
             # Initialize services
             theme_service = ThemeService(session)
             theme_init_service = ThemeInitService(theme_service)

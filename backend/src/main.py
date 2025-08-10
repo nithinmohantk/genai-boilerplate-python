@@ -48,6 +48,13 @@ async def lifespan(app: FastAPI):
     # Initialize health service
     await health_service.initialize()
 
+    # Initialize default themes
+    try:
+        from startup.theme_init import startup_initialization
+        await startup_initialization()
+    except Exception as e:
+        logger.error(f"Theme initialization failed: {e}")
+
     logger.info("Application startup complete")
 
     yield

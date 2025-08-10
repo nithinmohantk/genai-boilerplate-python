@@ -10,6 +10,7 @@ from api.admin import router as admin_router
 from api.auth import router as auth_router
 from api.chat import router as chat_router
 from api.documents import router as documents_router
+from api.themes_simple import router as themes_router
 
 # Create main API router
 api_router = APIRouter()
@@ -51,4 +52,5 @@ async def status():
 api_router.include_router(auth_router, prefix="/auth", tags=["Authentication"])
 api_router.include_router(chat_router, prefix="/chat", tags=["Chat"])
 api_router.include_router(documents_router, prefix="/documents", tags=["Documents"])
+api_router.include_router(themes_router, prefix="/themes", tags=["Themes"])
 api_router.include_router(admin_router, prefix="/admin", tags=["Admin"])

@@ -106,7 +106,7 @@ const ChatPage: React.FC = () => {
                 mb: 2,
                 ml: message.sender === 'user' ? 4 : 0,
                 mr: message.sender === 'bot' ? 4 : 0,
-                bgcolor: message.sender === 'user' ? 'primary.50' : 'background.paper',
+                bgcolor: message.sender === 'user' ? 'primary.light' : 'background.paper',
               }}
             >
               <CardContent sx={{ pb: 1, '&:last-child': { pb: 1 } }}>

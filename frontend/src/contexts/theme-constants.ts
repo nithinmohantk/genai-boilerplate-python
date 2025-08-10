@@ -107,39 +107,13 @@ export const getThemeConfig = (mode: PaletteMode): Theme => {
     shape: {
       borderRadius: 12,
     },
-    shadows: isDark
-      ? [
-          'none',
-          '0px 1px 3px rgba(0, 0, 0, 0.4)',
-          '0px 1px 6px rgba(0, 0, 0, 0.4)',
-          '0px 3px 12px rgba(0, 0, 0, 0.4)',
-          '0px 6px 16px rgba(0, 0, 0, 0.4)',
-          '0px 8px 24px rgba(0, 0, 0, 0.4)',
-          '0px 12px 32px rgba(0, 0, 0, 0.4)',
-          '0px 16px 40px rgba(0, 0, 0, 0.4)',
-          '0px 20px 48px rgba(0, 0, 0, 0.4)',
-          '0px 24px 56px rgba(0, 0, 0, 0.4)',
-          '0px 28px 64px rgba(0, 0, 0, 0.4)',
-          '0px 32px 72px rgba(0, 0, 0, 0.4)',
-          '0px 36px 80px rgba(0, 0, 0, 0.4)',
-          '0px 40px 88px rgba(0, 0, 0, 0.4)',
-          '0px 44px 96px rgba(0, 0, 0, 0.4)',
-          '0px 48px 104px rgba(0, 0, 0, 0.4)',
-          '0px 52px 112px rgba(0, 0, 0, 0.4)',
-          '0px 56px 120px rgba(0, 0, 0, 0.4)',
-          '0px 60px 128px rgba(0, 0, 0, 0.4)',
-          '0px 64px 136px rgba(0, 0, 0, 0.4)',
-          '0px 68px 144px rgba(0, 0, 0, 0.4)',
-          '0px 72px 152px rgba(0, 0, 0, 0.4)',
-          '0px 76px 160px rgba(0, 0, 0, 0.4)',
-          '0px 80px 168px rgba(0, 0, 0, 0.4)',
-          '0px 84px 176px rgba(0, 0, 0, 0.4)',
-        ]
-      : undefined,
+    // Use default Material-UI shadows to avoid array index issues
     components: {
       MuiCssBaseline: {
         styleOverrides: {
           body: {
+            backgroundColor: isDark ? '#0f172a' : '#f8fafc',
+            color: isDark ? '#f1f5f9' : '#1e293b',
             transition: 'background-color 0.3s ease-in-out, color 0.3s ease-in-out',
             scrollbarWidth: 'thin',
             scrollbarColor: isDark ? '#475569 #1e293b' : '#cbd5e1 #f8fafc',
@@ -156,6 +130,11 @@ export const getThemeConfig = (mode: PaletteMode): Theme => {
                 backgroundColor: isDark ? '#64748b' : '#94a3b8',
               },
             },
+          },
+          '#root': {
+            minHeight: '100vh',
+            backgroundColor: isDark ? '#0f172a' : '#f8fafc',
+            color: isDark ? '#f1f5f9' : '#1e293b',
           },
         },
       },

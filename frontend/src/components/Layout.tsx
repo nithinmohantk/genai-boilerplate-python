@@ -16,6 +16,7 @@ import {
   Chat as ChatIcon,
   Description as DocumentsIcon,
   Settings as SettingsIcon,
+  AdminPanelSettings as AdminIcon,
   Menu as MenuIcon,
 } from '@mui/icons-material';
 import DarkModeToggle from './DarkModeToggle';
@@ -34,6 +35,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { text: 'Chat', icon: <ChatIcon />, path: '/chat' },
     { text: 'Documents', icon: <DocumentsIcon />, path: '/documents' },
     { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
+    { text: 'Admin', icon: <AdminIcon />, path: '/admin' },
   ];
 
   const handleNavigation = (path: string) => {
@@ -99,7 +101,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   cursor: 'pointer',
                   mx: 1,
                   borderRadius: 1,
-                  bgcolor: location.pathname === item.path ? 'primary.50' : 'transparent',
+                  bgcolor: location.pathname === item.path ? 'primary.light' : 'transparent',
                   '&:hover': {
                     bgcolor: 'action.hover',
                   },
