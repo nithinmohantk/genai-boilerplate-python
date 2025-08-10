@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import CssBaseline from '@mui/material/CssBaseline';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -11,6 +11,22 @@ import AdminPage from './pages/AdminPage';
 import { globalThemeManager } from './utils/globalThemeManager';
 import { CustomThemeProvider } from './contexts/ThemeContext';
 import { ThemeApplicationProvider } from './contexts/ThemeApplicationContext';
+
+// Routes component that forces re-render on location change
+function AppRoutes() {
+  const location = useLocation();
+  console.log('🔄 AppRoutes: Location changed, re-rendering routes for:', location.pathname);
+  
+  return (
+    <Routes key={location.pathname}>
+      <Route path="/" element={<ChatPage key="chat-home" />} />
+      <Route path="/chat" element={<ChatPage key="chat" />} />
+      <Route path="/documents" element={<DocumentsPage key="documents" />} />
+      <Route path="/settings" element={<SettingsPage key="settings" />} />
+      <Route path="/admin" element={<AdminPage key="admin" />} />
+    </Routes>
+  );
+}
 
 // Create a client for React Query
 const queryClient = new QueryClient({
@@ -37,13 +53,7 @@ function App() {
             <ThemeApplicationProvider>
               <CssBaseline />
               <Layout>
-                <Routes>
-                  <Route path="/" element={<ChatPage />} />
-                  <Route path="/chat" element={<ChatPage />} />
-                  <Route path="/documents" element={<DocumentsPage />} />
-                  <Route path="/settings" element={<SettingsPage />} />
-                  <Route path="/admin" element={<AdminPage />} />
-                </Routes>
+                <AppRoutes />
               </Layout>
             </ThemeApplicationProvider>
           </CustomThemeProvider>

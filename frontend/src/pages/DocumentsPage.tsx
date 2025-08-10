@@ -34,6 +34,7 @@ interface Document {
 }
 
 const DocumentsPage: React.FC = () => {
+  console.log('📄 DocumentsPage: Component rendering/re-rendering');
   const [documents, setDocuments] = useState<Document[]>([
     {
       id: '1',

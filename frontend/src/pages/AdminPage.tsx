@@ -72,6 +72,7 @@ const fetchCategories = async (): Promise<string[]> => {
 };
 
 const AdminPage: React.FC = () => {
+  console.log('👨‍💼 AdminPage: Component rendering/re-rendering');
   const [tabValue, setTabValue] = useState(0);
   const [selectedTheme, setSelectedTheme] = useState<string | null>(null);
   

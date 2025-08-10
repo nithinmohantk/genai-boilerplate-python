@@ -51,6 +51,7 @@ interface Settings {
 }
 
 const SettingsPage: React.FC = () => {
+  console.log('⚙️ SettingsPage: Component rendering/re-rendering');
   const { mode: currentTheme, setTheme, isDark } = useTheme();
   
   

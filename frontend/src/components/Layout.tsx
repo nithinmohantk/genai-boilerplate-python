@@ -1,4 +1,4 @@
-import React, { type ReactNode } from 'react';
+import React, { type ReactNode, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Box,
@@ -20,6 +20,7 @@ import {
   Menu as MenuIcon,
 } from '@mui/icons-material';
 import DarkModeToggle from './DarkModeToggle';
+import NavigationMonitor from './NavigationMonitor';
 
 interface LayoutProps {
   children: ReactNode;
@@ -30,6 +31,12 @@ const drawerWidth = 240;
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Debug navigation changes
+  useEffect(() => {
+    console.log('🧭 Navigation Debug: Location changed to:', location.pathname);
+    console.log('🧭 Navigation Debug: Full location object:', location);
+  }, [location]);
 
   const menuItems = [
     { text: 'Chat', icon: <ChatIcon />, path: '/chat' },
@@ -137,7 +144,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         }}
       >
         <Toolbar />
-        {children}
+        <NavigationMonitor>
+          {children}
+        </NavigationMonitor>
       </Box>
     </Box>
   );

@@ -26,6 +26,7 @@ interface Message {
 }
 
 const ChatPage: React.FC = () => {
+  console.log('💬 ChatPage: Component rendering/re-rendering');
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
