@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.auth import get_current_user  # Assuming auth middleware exists
-from database.connection import get_db_session
+from database.session import get_db
 from models.theme import (
     Theme,
     ThemeCategory,
@@ -26,7 +26,7 @@ router = APIRouter(prefix="/themes", tags=["themes"])
 async def get_themes(
     category: ThemeCategory | None = None,
     include_system: bool = True,
-    session: AsyncSession = Depends(get_db_session),
+    session: AsyncSession = Depends(get_db),
 ):
     """Get all available themes, optionally filtered by category."""
     theme_service = ThemeService(session)
@@ -37,7 +37,7 @@ async def get_themes(
 
 
 @router.get("/{theme_id}", response_model=Theme)
-async def get_theme(theme_id: str, session: AsyncSession = Depends(get_db_session)):
+async def get_theme(theme_id: str, session: AsyncSession = Depends(get_db)):
     """Get a specific theme by ID."""
     theme_service = ThemeService(session)
     theme = await theme_service.get_theme(theme_id)
@@ -51,7 +51,7 @@ async def get_theme(theme_id: str, session: AsyncSession = Depends(get_db_sessio
 @router.post("/", response_model=Theme, status_code=status.HTTP_201_CREATED)
 async def create_theme(
     theme_data: ThemeCreate,
-    session: AsyncSession = Depends(get_db_session),
+    session: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """Create a new custom theme."""
@@ -66,7 +66,7 @@ async def create_theme(
 async def update_theme(
     theme_id: str,
     theme_data: ThemeUpdate,
-    session: AsyncSession = Depends(get_db_session),
+    session: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """Update an existing theme (only custom themes can be updated)."""
@@ -85,7 +85,7 @@ async def update_theme(
 @router.delete("/{theme_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_theme(
     theme_id: str,
-    session: AsyncSession = Depends(get_db_session),
+    session: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """Delete a custom theme (system themes cannot be deleted)."""
@@ -102,7 +102,7 @@ async def delete_theme(
 async def get_theme_css(
     theme_id: str,
     display_mode: str = "light",
-    session: AsyncSession = Depends(get_db_session),
+    session: AsyncSession = Depends(get_db),
 ):
     """Get generated CSS for a theme."""
     theme_service = ThemeService(session)
@@ -126,7 +126,7 @@ async def get_theme_categories():
 
 @router.get("/user/settings", response_model=UserThemeSettings)
 async def get_user_theme_settings(
-    session: AsyncSession = Depends(get_db_session),
+    session: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """Get current user's theme settings."""
@@ -147,7 +147,7 @@ async def get_user_theme_settings(
 )
 async def create_user_theme_settings(
     settings_data: UserThemeSettingsCreate,
-    session: AsyncSession = Depends(get_db_session),
+    session: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """Create or update user theme settings."""
@@ -161,7 +161,7 @@ async def create_user_theme_settings(
 @router.put("/user/settings", response_model=UserThemeSettings)
 async def update_user_theme_settings(
     settings_data: UserThemeSettingsUpdate,
-    session: AsyncSession = Depends(get_db_session),
+    session: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """Update user theme settings."""
@@ -180,7 +180,7 @@ async def update_user_theme_settings(
 @router.post("/user/apply/{theme_id}", response_model=UserThemeSettings)
 async def apply_theme_to_user(
     theme_id: str,
-    session: AsyncSession = Depends(get_db_session),
+    session: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """Apply a theme to the current user."""
@@ -198,7 +198,7 @@ async def apply_theme_to_user(
 
 @router.get("/user/current-css")
 async def get_current_user_theme_css(
-    session: AsyncSession = Depends(get_db_session),
+    session: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """Get CSS for current user's applied theme."""
@@ -215,7 +215,7 @@ async def get_current_user_theme_css(
 @router.get("/analytics/{theme_id}")
 async def get_theme_analytics(
     theme_id: str,
-    session: AsyncSession = Depends(get_db_session),
+    session: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),  # Admin check could be added here
 ):
     """Get analytics for a theme (usage statistics)."""
@@ -232,7 +232,7 @@ async def get_theme_analytics(
 @router.post("/{theme_id}/record-usage")
 async def record_theme_usage(
     theme_id: str,
-    session: AsyncSession = Depends(get_db_session),
+    session: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """Record theme usage for analytics."""
@@ -244,7 +244,7 @@ async def record_theme_usage(
 
 @router.get("/{theme_id}/accessibility-check")
 async def check_theme_accessibility(
-    theme_id: str, session: AsyncSession = Depends(get_db_session)
+    theme_id: str, session: AsyncSession = Depends(get_db)
 ):
     """Check accessibility compliance for a theme."""
     theme_service = ThemeService(session)

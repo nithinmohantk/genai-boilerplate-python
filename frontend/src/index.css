@@ -1,4 +1,4 @@
-@tailwind base;
+/* Removed Tailwind base to avoid conflicts with MUI theme */
 @tailwind components;
 @tailwind utilities;
 
@@ -11,11 +11,12 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background-color: #f8fafc;
+  /* Background color will be handled by MUI theme */
 }
 
 #root {
   min-height: 100vh;
+  /* Remove any constraints that might interfere with full-screen layout */
 }
 
 /* Custom scrollbar styles */

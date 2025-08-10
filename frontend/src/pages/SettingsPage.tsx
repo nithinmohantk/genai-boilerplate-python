@@ -26,6 +26,7 @@ import {
 } from '@mui/icons-material';
 import { useTheme as useCustomTheme } from '../contexts/useTheme';
 import DarkModeToggle from '../components/DarkModeToggle';
+import ThemeSelector from '../components/ThemeSelector';
 
 interface Settings {
   // AI Model Settings
@@ -378,7 +379,12 @@ const SettingsPage: React.FC = () => {
                 🌙 Theme & Interface
               </Typography>
               
-              {/* Theme Selection */}
+              {/* Professional Theme Selector */}
+              <Box sx={{ mb: 3 }}>
+                <ThemeSelector onThemeChange={(themeId) => console.log('Selected theme:', themeId)} />
+              </Box>
+              
+              {/* Theme Mode Selection */}
               <Box sx={{ mb: 3 }}>
                 <Typography variant="subtitle2" gutterBottom>
                   Theme Mode

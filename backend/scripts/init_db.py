@@ -13,7 +13,7 @@ backend_src = Path(__file__).parent.parent / "src"
 sys.path.insert(0, str(backend_src))
 
 from core.database import close_db, init_db
-from database.session import get_db
+from core.database import get_async_session
 from models.auth import TenantStatus, UserRole
 from services.auth_service import AuthService
 
@@ -32,7 +32,7 @@ async def create_default_data():
 
     print("📊 Creating default tenant and admin user...")
 
-    async for db in get_db():
+    async with get_async_session() as db:
         auth_service = AuthService(db)
 
         try:
@@ -96,7 +96,7 @@ async def create_default_data():
             print(f"❌ Error during initialization: {e}")
             raise
 
-        break  # Exit after first iteration
+        pass  # Session will be closed automatically
 
     # Close database connections
     await close_db()

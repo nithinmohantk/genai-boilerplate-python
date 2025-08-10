@@ -73,7 +73,7 @@ def setup_logging() -> None:
         # Human-readable format for development
         logger.add(
             sys.stdout,
-            format=format_log_record,
+            format="{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {name}:{function}:{line} - {message}",
             level=settings.log_level,
             colorize=True,
             backtrace=True,
@@ -97,7 +97,7 @@ def setup_logging() -> None:
     # Application logs
     logger.add(
         log_dir / "app.log",
-        format=serialize_log_record,
+        format="{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {name}:{function}:{line} - {message}",
         level="INFO",
         rotation="1 day",
         retention="30 days",
@@ -110,7 +110,7 @@ def setup_logging() -> None:
     # Error logs
     logger.add(
         log_dir / "error.log",
-        format=serialize_log_record,
+        format="{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {name}:{function}:{line} - {message}",
         level="ERROR",
         rotation="1 week",
         retention="8 weeks",
