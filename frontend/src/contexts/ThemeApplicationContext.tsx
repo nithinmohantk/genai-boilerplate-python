@@ -1,9 +1,6 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import { ThemeProvider, type Theme } from '@mui/material/styles';
 import { useThemeApplication } from '../hooks/useThemeApplication';
-import { useTheme } from './useTheme';
-import { getThemeConfig } from './theme-constants';
 
 interface ThemeApplicationContextType {
   previewTheme: (themeId: string) => Promise<void>;
@@ -21,30 +18,14 @@ interface ThemeApplicationProviderProps {
 }
 
 export const ThemeApplicationProvider: React.FC<ThemeApplicationProviderProps> = ({ children }) => {
-  const baseTheme = useTheme();
   const {
     isApplying,
     appliedTheme,
-    previewTheme,
     previewThemeById,
     applyTheme: applyThemeHook,
     clearPreview,
     loadSavedTheme,
   } = useThemeApplication();
-
-  // State to track the actual theme to use
-  const [currentTheme, setCurrentTheme] = useState<Theme>(() => 
-    getThemeConfig(baseTheme.isDark ? 'dark' : 'light')
-  );
-
-  // Update current theme when base theme changes or preview theme changes
-  useEffect(() => {
-    if (previewTheme) {
-      setCurrentTheme(previewTheme);
-    } else {
-      setCurrentTheme(getThemeConfig(baseTheme.isDark ? 'dark' : 'light'));
-    }
-  }, [previewTheme, baseTheme.isDark]);
 
   // Load saved theme on mount
   useEffect(() => {
@@ -61,7 +42,7 @@ export const ThemeApplicationProvider: React.FC<ThemeApplicationProviderProps> =
 
   return (
     <ThemeApplicationContext.Provider value={contextValue}>
-      <ThemeProvider theme={currentTheme}>{children}</ThemeProvider>
+      {children}
     </ThemeApplicationContext.Provider>
   );
 };

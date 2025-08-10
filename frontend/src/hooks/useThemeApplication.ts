@@ -135,10 +135,18 @@ export const useThemeApplication = () => {
       const themeData = await fetchThemeDetails(themeId);
       const muiTheme = createMUITheme(themeData, themeContext.isDark);
       setPreviewTheme(muiTheme);
-      setAppliedTheme(themeId);
+      
+      // Don't set as applied theme - this is just a preview
+      // setAppliedTheme(themeId);
       
       // Store the preview in localStorage for persistence
       localStorage.setItem('preview-theme', themeId);
+      localStorage.removeItem('applied-theme'); // Remove applied theme when previewing
+      
+      // Dispatch custom event to update the main theme provider
+      window.dispatchEvent(new CustomEvent('backend-theme-change', {
+        detail: { theme: muiTheme, themeId: themeId }
+      }));
       
       console.log(`Previewing theme: ${themeData.display_name}`);
     } catch (error) {
@@ -161,6 +169,11 @@ export const useThemeApplication = () => {
       localStorage.setItem('applied-theme', themeId);
       localStorage.removeItem('preview-theme');
       
+      // Dispatch custom event to update the main theme provider
+      window.dispatchEvent(new CustomEvent('backend-theme-change', {
+        detail: { theme: muiTheme, themeId: themeId }
+      }));
+      
       console.log(`Applied theme: ${themeData.display_name}`);
     } catch (error) {
       console.error('Failed to apply theme:', error);
@@ -174,6 +187,10 @@ export const useThemeApplication = () => {
     setPreviewTheme(null);
     setAppliedTheme(null);
     localStorage.removeItem('preview-theme');
+    
+    // Dispatch custom event to clear the theme
+    window.dispatchEvent(new CustomEvent('backend-theme-clear'));
+    
     console.log('Cleared theme preview');
   }, []);
 
