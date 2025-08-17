@@ -82,9 +82,11 @@ class HealthService:
             return {
                 "healthy": is_healthy,
                 "response_time_ms": response_time,
-                "message": "Database connection successful"
-                if is_healthy
-                else "Database connection failed",
+                "message": (
+                    "Database connection successful"
+                    if is_healthy
+                    else "Database connection failed"
+                ),
             }
         except Exception as e:
             response_time = round((time.time() - start_time) * 1000, 2)
@@ -108,9 +110,11 @@ class HealthService:
             return {
                 "healthy": is_healthy,
                 "response_time_ms": response_time,
-                "message": "Cache connection successful"
-                if is_healthy
-                else "Cache connection failed",
+                "message": (
+                    "Cache connection successful"
+                    if is_healthy
+                    else "Cache connection failed"
+                ),
             }
         except Exception as e:
             response_time = round((time.time() - start_time) * 1000, 2)

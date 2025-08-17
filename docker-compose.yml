@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # PostgreSQL Database
   postgres:
@@ -38,6 +36,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    image: thingxcloud/genai-boilerplate-python-backend:latest
     container_name: genai-backend
     environment:
       - DATABASE_URL=postgresql://genai_user:genai_password@postgres:5432/genai_chatbot
@@ -64,14 +63,16 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    image: thingxcloud/genai-boilerplate-python-frontend:latest
     container_name: genai-frontend
     volumes:
       - ./frontend:/app
       - /app/node_modules
     ports:
-      - "3000:3000"
+      - "3000:8080"
     environment:
       - REACT_APP_API_URL=http://localhost:8000
+      - REACT_APP_WS_URL=ws://localhost:8000
     depends_on:
       - backend
 

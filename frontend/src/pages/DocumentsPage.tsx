@@ -7,7 +7,6 @@ import {
   Card,
   CardContent,
   CardActions,
-  Grid,
   Chip,
   IconButton,
   Dialog,
@@ -35,6 +34,18 @@ interface Document {
 }
 
 const DocumentsPage: React.FC = () => {
+  const mountId = React.useRef(`documents-${Date.now()}-${Math.random()}`);
+  const renderCount = React.useRef(0);
+  
+  React.useEffect(() => {
+    console.log('📄 DocumentsPage: Component MOUNTED with ID:', mountId.current);
+    return () => {
+      console.log('📄 DocumentsPage: Component UNMOUNTED with ID:', mountId.current);
+    };
+  }, []);
+  
+  renderCount.current += 1;
+  console.log('📄 DocumentsPage: Render #', renderCount.current, 'ID:', mountId.current);
   const [documents, setDocuments] = useState<Document[]>([
     {
       id: '1',
@@ -164,9 +175,19 @@ const DocumentsPage: React.FC = () => {
       </Paper>
 
       {/* Documents Grid */}
-      <Grid container spacing={2}>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: '1fr',
+            sm: 'repeat(2, 1fr)',
+            md: 'repeat(3, 1fr)',
+          },
+          gap: 2,
+        }}
+      >
         {documents.map((document) => (
-          <Grid item xs={12} sm={6} md={4} key={document.id}>
+          <Box key={document.id}>
             <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <CardContent sx={{ flexGrow: 1 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -228,9 +249,9 @@ const DocumentsPage: React.FC = () => {
                 </IconButton>
               </CardActions>
             </Card>
-          </Grid>
+          </Box>
         ))}
-      </Grid>
+      </Box>
 
       {/* Upload Dialog */}
       <Dialog open={uploadDialogOpen} onClose={() => setUploadDialogOpen(false)} maxWidth="sm" fullWidth>

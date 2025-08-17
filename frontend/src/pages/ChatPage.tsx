@@ -26,6 +26,18 @@ interface Message {
 }
 
 const ChatPage: React.FC = () => {
+  const mountId = React.useRef(`chat-${Date.now()}-${Math.random()}`);
+  const renderCount = React.useRef(0);
+  
+  React.useEffect(() => {
+    console.log('💬 ChatPage: Component MOUNTED with ID:', mountId.current);
+    return () => {
+      console.log('💬 ChatPage: Component UNMOUNTED with ID:', mountId.current);
+    };
+  }, []);
+  
+  renderCount.current += 1;
+  console.log('💬 ChatPage: Render #', renderCount.current, 'ID:', mountId.current);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -64,7 +76,7 @@ const ChatPage: React.FC = () => {
     setTimeout(() => {
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: `I received your message: \"${userMessage.content}\". This is a placeholder response. The actual GenAI integration will be implemented with the backend API.`,
+        content: `I received your message: "${userMessage.content}". This is a placeholder response. The actual GenAI integration will be implemented with the backend API.`,
         sender: 'bot',
         timestamp: new Date(),
       };
@@ -106,7 +118,7 @@ const ChatPage: React.FC = () => {
                 mb: 2,
                 ml: message.sender === 'user' ? 4 : 0,
                 mr: message.sender === 'bot' ? 4 : 0,
-                bgcolor: message.sender === 'user' ? 'primary.50' : 'background.paper',
+                bgcolor: message.sender === 'user' ? 'primary.light' : 'background.paper',
               }}
             >
               <CardContent sx={{ pb: 1, '&:last-child': { pb: 1 } }}>
