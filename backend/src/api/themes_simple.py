@@ -34,7 +34,7 @@ async def get_themes(session: AsyncSession = Depends(get_db_session)):
                 "css_variables": theme.css_variables,
                 "is_system": theme.is_system,
                 "is_active": theme.is_active,
-                "usage_count": theme.usage_count
+                "usage_count": theme.usage_count,
             }
             theme_list.append(theme_dict)
 
@@ -43,7 +43,7 @@ async def get_themes(session: AsyncSession = Depends(get_db_session)):
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error fetching themes: {str(e)}"
+            detail=f"Error fetching themes: {str(e)}",
         ) from e
 
 
@@ -64,6 +64,7 @@ async def get_theme(theme_id: str, session: AsyncSession = Depends(get_db_sessio
         # Try to get theme by ID first (UUID format)
         try:
             from uuid import UUID
+
             # If it's a valid UUID, search by ID
             uuid_obj = UUID(theme_id)
             theme = await theme_service.get_theme(uuid_obj)
@@ -90,7 +91,7 @@ async def get_theme(theme_id: str, session: AsyncSession = Depends(get_db_sessio
             "css_variables": theme.css_variables,
             "is_system": theme.is_system,
             "is_active": theme.is_active,
-            "usage_count": theme.usage_count
+            "usage_count": theme.usage_count,
         }
 
         return theme_dict
@@ -100,5 +101,5 @@ async def get_theme(theme_id: str, session: AsyncSession = Depends(get_db_sessio
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error fetching theme: {str(e)}"
+            detail=f"Error fetching theme: {str(e)}",
         ) from e

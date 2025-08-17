@@ -51,6 +51,7 @@ async def lifespan(app: FastAPI):
     # Initialize default themes
     try:
         from startup.theme_init import startup_initialization
+
         await startup_initialization()
     except Exception as e:
         logger.error(f"Theme initialization failed: {e}")
