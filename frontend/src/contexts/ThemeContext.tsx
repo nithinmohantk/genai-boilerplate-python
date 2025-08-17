@@ -65,9 +65,9 @@ export const CustomThemeProvider: React.FC<ThemeContextProviderProps> = ({ child
 
   // Update backend theme when base theme mode changes (for applied backend themes)
   useEffect(() => {
-    // If there's a backend theme active, we need to recreate it with the new mode
     if (backendTheme) {
-      // Dispatch an event to trigger backend theme recreation with new mode
+      // If there's a backend theme and the base mode changed, trigger a recreate event
+      console.log(`Dispatching mode change event for backend theme: ${isDark ? 'dark' : 'light'}`);
       window.dispatchEvent(new CustomEvent('base-theme-mode-change', {
         detail: { isDark: isDark }
       }));

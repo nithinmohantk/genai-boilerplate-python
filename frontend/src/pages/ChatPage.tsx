@@ -26,6 +26,18 @@ interface Message {
 }
 
 const ChatPage: React.FC = () => {
+  const mountId = React.useRef(`chat-${Date.now()}-${Math.random()}`);
+  const renderCount = React.useRef(0);
+  
+  React.useEffect(() => {
+    console.log('💬 ChatPage: Component MOUNTED with ID:', mountId.current);
+    return () => {
+      console.log('💬 ChatPage: Component UNMOUNTED with ID:', mountId.current);
+    };
+  }, []);
+  
+  renderCount.current += 1;
+  console.log('💬 ChatPage: Render #', renderCount.current, 'ID:', mountId.current);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',

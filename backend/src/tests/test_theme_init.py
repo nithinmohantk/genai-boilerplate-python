@@ -156,8 +156,21 @@ def test_color_accessibility():
 
     def hex_to_rgb(hex_color):
         """Convert hex color to RGB tuple."""
+        # Skip non-hex colors (like rgba, rgb, etc.)
+        if not isinstance(hex_color, str) or not hex_color.startswith("#"):
+            # Return a default high-contrast color for non-hex values
+            return (128, 128, 128)  # Gray as fallback
+
         hex_color = hex_color.lstrip("#")
-        return tuple(int(hex_color[i : i + 2], 16) for i in (0, 2, 4))
+        if len(hex_color) != 6:
+            # Return a default color for invalid hex format
+            return (128, 128, 128)  # Gray as fallback
+
+        try:
+            return tuple(int(hex_color[i : i + 2], 16) for i in (0, 2, 4))
+        except ValueError:
+            # Return a default color for parsing errors
+            return (128, 128, 128)  # Gray as fallback
 
     def calculate_luminance(rgb):
         """Calculate relative luminance of a color."""

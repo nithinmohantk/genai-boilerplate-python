@@ -34,6 +34,18 @@ interface Document {
 }
 
 const DocumentsPage: React.FC = () => {
+  const mountId = React.useRef(`documents-${Date.now()}-${Math.random()}`);
+  const renderCount = React.useRef(0);
+  
+  React.useEffect(() => {
+    console.log('📄 DocumentsPage: Component MOUNTED with ID:', mountId.current);
+    return () => {
+      console.log('📄 DocumentsPage: Component UNMOUNTED with ID:', mountId.current);
+    };
+  }, []);
+  
+  renderCount.current += 1;
+  console.log('📄 DocumentsPage: Render #', renderCount.current, 'ID:', mountId.current);
   const [documents, setDocuments] = useState<Document[]>([
     {
       id: '1',

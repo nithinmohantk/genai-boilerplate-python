@@ -24,9 +24,8 @@ import {
   DarkMode as DarkModeIcon,
   SettingsBrightness as AutoModeIcon,
 } from '@mui/icons-material';
-import { useTheme as useCustomTheme } from '../contexts/useTheme';
+import { useTheme } from '../contexts/useTheme';
 import DarkModeToggle from '../components/DarkModeToggle';
-import ThemeSelector from '../components/ThemeSelector';
 
 interface Settings {
   // AI Model Settings
@@ -52,7 +51,21 @@ interface Settings {
 }
 
 const SettingsPage: React.FC = () => {
-  const { mode: currentTheme, setTheme, isDark } = useCustomTheme();
+  const mountId = React.useRef(`settings-${Date.now()}-${Math.random()}`);
+  const renderCount = React.useRef(0);
+  
+  React.useEffect(() => {
+    console.log('⚙️ SettingsPage: Component MOUNTED with ID:', mountId.current);
+    return () => {
+      console.log('⚙️ SettingsPage: Component UNMOUNTED with ID:', mountId.current);
+    };
+  }, []);
+  
+  renderCount.current += 1;
+  console.log('⚙️ SettingsPage: Render #', renderCount.current, 'ID:', mountId.current);
+  
+  const { mode: currentTheme, setTheme, isDark } = useTheme();
+  
   
   const [settings, setSettings] = useState<Settings>({
     aiProvider: 'openai',
@@ -379,10 +392,6 @@ const SettingsPage: React.FC = () => {
                 🌙 Theme & Interface
               </Typography>
               
-              {/* Professional Theme Selector */}
-              <Box sx={{ mb: 3 }}>
-                <ThemeSelector onThemeChange={(themeId) => console.log('Selected theme:', themeId)} />
-              </Box>
               
               {/* Theme Mode Selection */}
               <Box sx={{ mb: 3 }}>
